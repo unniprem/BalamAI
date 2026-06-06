@@ -70,14 +70,35 @@ export function startWorkout(workout) {
   return { ...workout, startedAt: workout.startedAt || new Date().toISOString() };
 }
 
-export function replaceExercise(workout, exerciseEntryId, newExerciseId) {
+export function replaceExercise(workout, exerciseEntryId, newExerciseId, history = []) {
+  const mode = getMode(workout.mode);
+  const newDef = getExerciseById(newExerciseId);
   return {
     ...workout,
-    exercises: workout.exercises.map((entry) =>
-      entry.id === exerciseEntryId
-        ? { ...entry, exerciseId: newExerciseId }
-        : entry,
-    ),
+    exercises: workout.exercises.map((entry) => {
+      if (entry.id !== exerciseEntryId) return entry;
+      const rec = recommendForExercise(history, newDef.id, mode.id, newDef.increment);
+      const next = {
+        ...entry,
+        exerciseId: newExerciseId,
+        sets: entry.sets.map((s) => ({
+          ...s,
+          weight: rec.weight,
+          reps: rec.reps,
+          completed: false,
+        })),
+      };
+      if (rec.source !== "first-time") {
+        next.recommendation = {
+          source: rec.source,
+          fromWeight: rec.fromWeight,
+          fromReps: rec.fromReps,
+        };
+      } else {
+        delete next.recommendation;
+      }
+      return next;
+    }),
   };
 }
 
