@@ -18,6 +18,7 @@ import {
   startWorkout,
   updateSet,
 } from "@/lib/workout";
+import { loadSettings } from "@/lib/storage";
 
 function useElapsed(startedAt) {
   const [now, setNow] = useState(() => Date.now());
@@ -57,7 +58,8 @@ export default function Workout() {
 
   function handleGenerate() {
     const previous = history[0] || workout;
-    setWorkout(startWorkout(generateWorkout(previous)));
+    const { mode } = loadSettings();
+    setWorkout(startWorkout(generateWorkout(previous, mode)));
   }
 
   function handleFinish() {
