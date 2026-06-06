@@ -64,7 +64,6 @@ function warnUnmapped(tag) {
   if (import.meta.env.PROD) return;
   if (_warnedUnmapped.has(tag)) return;
   _warnedUnmapped.add(tag);
-  // eslint-disable-next-line no-console
   console.warn(`[recovery] Unmapped muscle tag: "${tag}"`);
 }
 

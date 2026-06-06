@@ -31,7 +31,7 @@
 **Files:**
 - Create: `src/lib/recovery.js`
 
-- [ ] **Step 1: Create the file**
+- [x] **Step 1: Create the file**
 
 Write `src/lib/recovery.js`:
 
@@ -213,17 +213,17 @@ export function workoutRedBuckets(workout, history, nowMs) {
 }
 ```
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: Vite reports success. The module is unused so far — this confirms valid syntax.
 
-- [ ] **Step 4: Manual probe — pure-function sanity via DevTools**
+- [x] **Step 4: Manual probe — pure-function sanity via DevTools**
 
 Start dev server: `npm run dev`. In the running app's DevTools console:
 
@@ -308,7 +308,7 @@ console.log("J:", m.recoveryLabel(J.find(e => e.bucket === "chest"), now)); // E
 
 All ten log lines must match their expected output. If any drifts, fix the helper before continuing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/recovery.js
@@ -322,12 +322,12 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Create: `src/components/RecoveryPanel.jsx`
 
-- [ ] **Step 1: Create the file**
+- [x] **Step 1: Create the file**
 
 Write `src/components/RecoveryPanel.jsx`:
 
 ```jsx
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   BUCKET_LABELS,
@@ -343,7 +343,9 @@ const DOT_BY_STATUS = {
 };
 
 export function RecoveryPanel({ history }) {
-  const nowMs = Date.now();
+  // Captured once on mount — `react-hooks/purity` rejects a bare `Date.now()`
+  // during render. Re-mount on nav refreshes this naturally.
+  const [nowMs] = useState(() => Date.now());
   const rows = useMemo(() => recoveryStatus(history, nowMs), [history, nowMs]);
 
   if (!history || history.length === 0) return null;
@@ -376,17 +378,17 @@ export function RecoveryPanel({ history }) {
 
 > The `nowMs` is captured once per render, which means the panel labels won't tick from "today" to "yesterday" if the user leaves the dashboard open across midnight. That's acceptable for V3.2; any nav action re-renders the panel.
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 4: Commit (component only — Dashboard wiring lands in Task 3)**
+- [x] **Step 4: Commit (component only — Dashboard wiring lands in Task 3)**
 
 ```bash
 git add src/components/RecoveryPanel.jsx
@@ -400,7 +402,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/pages/Dashboard.jsx`
 
-- [ ] **Step 1: Add the import**
+- [x] **Step 1: Add the import**
 
 In `src/pages/Dashboard.jsx`, add a line to the imports block (alphabetically near `StatsCard` and `WorkoutCard`):
 
@@ -408,7 +410,7 @@ In `src/pages/Dashboard.jsx`, add a line to the imports block (alphabetically ne
 import { RecoveryPanel } from "@/components/RecoveryPanel";
 ```
 
-- [ ] **Step 2: Mount the panel between stats grid and mode toggle**
+- [x] **Step 2: Mount the panel between stats grid and mode toggle**
 
 Find the JSX block that ends the 3-card stats grid (`</div>` after the three `<StatsCard>` elements, currently around line 80). Immediately after that `</div>` and before the next `<div className="flex flex-col gap-2">` (the Training mode block), insert:
 
@@ -438,17 +440,17 @@ The resulting region of `Dashboard.jsx` reads:
           </span>
 ```
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe — empty history hides the panel**
+- [x] **Step 5: Manual probe — empty history hides the panel**
 
 `npm run dev`. In DevTools:
 
@@ -459,7 +461,7 @@ location.reload();
 
 The Dashboard should render: header → stats grid → Training mode toggle → CTA card. No "RECOVERY" panel anywhere.
 
-- [ ] **Step 6: Manual probe — one completed workout shows the panel**
+- [x] **Step 6: Manual probe — one completed workout shows the panel**
 
 Still in `npm run dev`. In DevTools:
 
@@ -494,7 +496,7 @@ The Dashboard now shows a "RECOVERY" card between the stats row and the Training
 - Hams+Glut = green, label `ready`
 - Core = green, label `ready`
 
-- [ ] **Step 7: Manual probe — 50h-ago session shows green "2d ago"**
+- [x] **Step 7: Manual probe — 50h-ago session shows green "2d ago"**
 
 In DevTools:
 
@@ -510,14 +512,14 @@ location.reload();
 
 Recovery panel: Chest/Shoulders/Triceps all green, label `2d ago`. Others green `ready`.
 
-- [ ] **Step 8: Cleanup**
+- [x] **Step 8: Cleanup**
 
 ```js
 localStorage.clear();
 location.reload();
 ```
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add src/pages/Dashboard.jsx
@@ -531,12 +533,12 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Create: `src/components/RecoveryWarning.jsx`
 
-- [ ] **Step 1: Create the file**
+- [x] **Step 1: Create the file**
 
 Write `src/components/RecoveryWarning.jsx`:
 
 ```jsx
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -565,7 +567,9 @@ function worstRedLabel(redBuckets, history, nowMs) {
 }
 
 export function RecoveryWarning({ workout, history, onRegenerate, onKeep }) {
-  const nowMs = Date.now();
+  // Captured once on mount — `react-hooks/purity` rejects a bare `Date.now()`
+  // during render. The Workout page remounts this on navigation.
+  const [nowMs] = useState(() => Date.now());
   const reds = useMemo(
     () => workoutRedBuckets(workout, history, nowMs),
     [workout, history, nowMs],
@@ -600,17 +604,17 @@ export function RecoveryWarning({ workout, history, onRegenerate, onKeep }) {
 }
 ```
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 4: Commit (component only — Workout wiring lands in Task 5)**
+- [x] **Step 4: Commit (component only — Workout wiring lands in Task 5)**
 
 ```bash
 git add src/components/RecoveryWarning.jsx
@@ -624,7 +628,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/pages/Workout.jsx`
 
-- [ ] **Step 1: Add the import**
+- [x] **Step 1: Add the import**
 
 In `src/pages/Workout.jsx`, add to the existing imports block (near the `ExerciseCard` import):
 
@@ -632,7 +636,7 @@ In `src/pages/Workout.jsx`, add to the existing imports block (near the `Exercis
 import { RecoveryWarning } from "@/components/RecoveryWarning";
 ```
 
-- [ ] **Step 2: Add the regenerate/keep handlers**
+- [x] **Step 2: Add the regenerate/keep handlers**
 
 Inside the `Workout` component, immediately AFTER the existing `handleFinish` function and BEFORE the `if (!workout)` block, add:
 
@@ -651,7 +655,7 @@ Inside the `Workout` component, immediately AFTER the existing `handleFinish` fu
 
 > `generateWorkout` and `startWorkout` are already imported at the top of the file. `setWorkout`, `update`, and `history` are already in scope.
 
-- [ ] **Step 3: Render the warning above the first exercise card**
+- [x] **Step 3: Render the warning above the first exercise card**
 
 Locate the JSX block that renders `workout.exercises.map(...)`:
 
@@ -690,17 +694,17 @@ The resulting region reads:
         {workout.exercises.map((entry) => (
 ```
 
-- [ ] **Step 4: Lint passes**
+- [x] **Step 4: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 5: Build passes**
+- [x] **Step 5: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 6: Manual probe — banner appears, Regenerate works, Keep persists**
+- [x] **Step 6: Manual probe — banner appears, Regenerate works, Keep persists**
 
 `npm run dev`. In DevTools:
 
@@ -742,7 +746,7 @@ On the Dashboard, click **Generate new**. You arrive on `/workout`.
     ```
 4. **Persistence:** Reload the page (`location.reload()`). The banner stays gone (flag persisted on the workout).
 
-- [ ] **Step 7: Manual probe — pluralization variants**
+- [x] **Step 7: Manual probe — pluralization variants**
 
 While still on `/workout` with the bench-today seed in history:
 
@@ -788,7 +792,7 @@ location.reload();
 
 Banner text: `This workout hits Chest, Shoulders, and Triceps, which you trained today.` (Oxford comma + BUCKET_ORDER.)
 
-- [ ] **Step 8: Manual probe — no red buckets → no banner**
+- [x] **Step 8: Manual probe — no red buckets → no banner**
 
 ```js
 localStorage.clear();
@@ -814,14 +818,14 @@ location.reload();
 
 Generate new → `/workout`. No banner. Recovery panel on Dashboard shows the relevant buckets as green `2d ago`.
 
-- [ ] **Step 9: Cleanup**
+- [x] **Step 9: Cleanup**
 
 ```js
 localStorage.clear();
 location.reload();
 ```
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add src/pages/Workout.jsx
@@ -834,7 +838,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 
 **Files:** none — verification only.
 
-- [ ] **Step 1: Clean lint + build**
+- [x] **Step 1: Clean lint + build**
 
 ```bash
 npm run lint
@@ -843,7 +847,7 @@ npm run build
 
 Both must pass with 0 errors. Warnings that pre-existed before V3.2 are acceptable; new ones are not.
 
-- [ ] **Step 2: End-to-end smoke checklist**
+- [x] **Step 2: End-to-end smoke checklist**
 
 `npm run dev`. Walk these in order — every box must check:
 
@@ -893,7 +897,7 @@ Both must pass with 0 errors. Warnings that pre-existed before V3.2 are acceptab
 10. **Mode-agnostic.** Inject a strength-mode bench session today (`mode: "strength"`). Switch Dashboard mode to hypertrophy. Recovery panel still shows Chest=red `today`. Banner still fires for hypertrophy-mode generated workouts that hit chest.
 11. **`> 7d` cap.** Inject `completedAt: new Date(Date.now() - 10*24*3600_000).toISOString()`. Affected buckets show `7d+ ago` (not `10d ago`).
 
-- [ ] **Step 3: No partial commits left**
+- [x] **Step 3: No partial commits left**
 
 ```bash
 git status
@@ -901,7 +905,7 @@ git status
 
 Expected: working tree clean.
 
-- [ ] **Step 4: Final marker commit (only if V3.2 changes remain uncommitted)**
+- [x] **Step 4: Final marker commit (only if V3.2 changes remain uncommitted)**
 
 If `git status` shows V3.2-related modifications grouped from a probe gone wrong, commit them:
 
