@@ -44,13 +44,15 @@ Eight display buckets, defined as `MUSCLE_BUCKET_MAP` in `src/lib/recovery.js`:
 | Bucket | Raw `muscles[]` tags that contribute |
 |---|---|
 | `chest` | `chest`, `upper-chest` |
-| `back` | `lats`, `mid-back`, `lower-back`, `traps` |
+| `back` | `lats`, `mid-back`, `upper-back`, `lower-back`, `traps` |
 | `shoulders` | `front-delts`, `side-delts`, `rear-delts`, `shoulders` |
 | `biceps` | `biceps`, `forearms` |
 | `triceps` | `triceps` |
 | `quads` | `quads` |
 | `hams-glut` | `hamstrings`, `glutes` |
-| `core` | `core`, `obliques`, `calves` |
+| `core` | `core`, `abs`, `lower-abs`, `obliques`, `calves` |
+
+Derived from inspecting `src/data/exercises.js` (verified via `grep -oh 'muscles: \[[^]]*\]'`). All 21 distinct tags present in the catalog at the time of writing are mapped: `chest, upper-chest, lats, mid-back, upper-back, lower-back, traps, front-delts, side-delts, rear-delts, biceps, forearms, triceps, quads, hamstrings, glutes, core, abs, lower-abs, obliques, calves`. The tag `shoulders` is mapped defensively (not currently used in the catalog).
 
 Display labels (used by `RecoveryPanel`): `Chest`, `Back`, `Shoulders`, `Biceps`, `Triceps`, `Quads`, `Hams+Glut`, `Core`.
 
