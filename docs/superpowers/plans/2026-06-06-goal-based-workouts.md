@@ -34,7 +34,7 @@
 **Files:**
 - Create: `src/data/modes.js`
 
-- [ ] **Step 1: Create the catalog file**
+- [x] **Step 1: Create the catalog file**
 
 Write `src/data/modes.js`:
 
@@ -88,17 +88,17 @@ export function formatRestRange({ restMin, restMax }) {
 }
 ```
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: Vite reports success; bundle still builds (the new module is unused so far, just confirms valid syntax).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/data/modes.js
