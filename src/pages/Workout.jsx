@@ -138,7 +138,7 @@ export default function Workout() {
               update((prev) => removeSet(prev, entryId, setId))
             }
             onReplace={(entryId, newExerciseId) =>
-              update((prev) => replaceExercise(prev, entryId, newExerciseId))
+              update((prev) => replaceExercise(prev, entryId, newExerciseId, history))
             }
           />
         ))}

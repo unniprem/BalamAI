@@ -32,7 +32,7 @@
 **Files:**
 - Modify: `src/data/exercises.js`
 
-- [ ] **Step 1: Add `increment` to every exercise definition**
+- [x] **Step 1: Add `increment` to every exercise definition**
 
 For each `EXERCISES` entry, add `increment: <value>,` immediately after the `equipment: [...]` line. The full per-id mapping is below. Implementers: this is mechanical insertion — every existing object gains exactly one new key with the value from this table.
 
@@ -122,7 +122,7 @@ Example shape for `bench-press` after editing:
 },
 ```
 
-- [ ] **Step 2: Verify all entries gained the field**
+- [x] **Step 2: Verify all entries gained the field**
 
 Run:
 
@@ -133,17 +133,17 @@ grep -c '^\s*increment:' src/data/exercises.js
 
 Expected: both counts equal (one `increment` per `id`). If counts differ, find the entry that was missed.
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: Vite reports success.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/data/exercises.js
@@ -157,7 +157,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Create: `src/lib/overload.js`
 
-- [ ] **Step 1: Create the file**
+- [x] **Step 1: Create the file**
 
 Write `src/lib/overload.js`:
 
@@ -232,17 +232,17 @@ function findLastSession(history, exerciseId, modeId) {
 }
 ```
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success. The module is unused so far — this just confirms valid syntax.
 
-- [ ] **Step 4: Manual probe — pure-function sanity via DevTools**
+- [x] **Step 4: Manual probe — pure-function sanity via DevTools**
 
 Start dev server: `npm run dev`. In the running app's DevTools console:
 
@@ -316,7 +316,7 @@ console.log("F:", m.recommendForExercise(histLegacy, "bench-press", "hypertrophy
 
 All six logs must match the "Expected" comment. If any drift, fix the helper before continuing.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/overload.js
@@ -330,7 +330,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/lib/workout.js`
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 In `src/lib/workout.js`, change:
 
@@ -347,7 +347,7 @@ import { getMode } from "@/data/modes";
 import { recommendForExercise } from "@/lib/overload";
 ```
 
-- [ ] **Step 2: Replace `generateWorkout` body**
+- [x] **Step 2: Replace `generateWorkout` body**
 
 Current `generateWorkout` (the function exported on lines 12-48):
 
@@ -453,17 +453,17 @@ function buildEntry(exerciseDef, mode, history) {
 
 > `buildEntry` is also called by Task 5's updated `replaceExercise`, so leave the helper in this module.
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe — defaults still work (no history)**
+- [x] **Step 5: Manual probe — defaults still work (no history)**
 
 `npm run dev`. With an empty `balamai:workouts` (the default for a fresh user, or after `localStorage.removeItem("balamai:workouts"); location.reload();`), click "Generate new" on the Dashboard. In DevTools:
 
@@ -474,7 +474,7 @@ console.log(w.exercises.map(e => ({ id: e.exerciseId, sets: e.sets.length, w0: e
 
 Every entry should show `w0: 0`, `r0: 0`, `rec: undefined`. Sets count matches the mode (4 for hypertrophy default).
 
-- [ ] **Step 6: Manual probe — with injected history, the bump applies**
+- [x] **Step 6: Manual probe — with injected history, the bump applies**
 
 Still in `npm run dev`. In DevTools:
 
@@ -516,7 +516,7 @@ If push category picked another exercise (random), regenerate until Bench Press 
 
 Cleanup: `localStorage.removeItem("balamai:workouts"); localStorage.removeItem("balamai:current-workout"); location.reload();`.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/lib/workout.js
@@ -530,7 +530,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/pages/Dashboard.jsx`
 
-- [ ] **Step 1: Update `handleGenerate`**
+- [x] **Step 1: Update `handleGenerate`**
 
 The current `handleGenerate` looks like:
 
@@ -556,17 +556,17 @@ function handleGenerate() {
 
 > No new imports needed: `workouts` is already in scope from `const { workouts } = useWorkoutHistory();` higher up in the component.
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 4: Manual probe — end-to-end through the UI**
+- [x] **Step 4: Manual probe — end-to-end through the UI**
 
 `npm run dev`. Walk this in the browser:
 
@@ -585,7 +585,7 @@ Expected: `recommendation: { source: "bumped", fromWeight: 60, fromReps: 12 }` a
 
 > If "avoid previous workout" keeps swapping bench out, that's expected behaviour — see Task 9's smoke checklist for the manual injection technique used to force this case.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/pages/Dashboard.jsx
@@ -599,7 +599,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/lib/workout.js`
 
-- [ ] **Step 1: Replace `replaceExercise` body**
+- [x] **Step 1: Replace `replaceExercise` body**
 
 The current export:
 
@@ -654,17 +654,17 @@ export function replaceExercise(workout, exerciseEntryId, newExerciseId, history
 
 > Behaviour change vs. today: prior to this task, `replaceExercise` only changed `exerciseId` and left stale set values from the previous exercise. Now it also resets each set's `weight`/`reps`/`completed` and updates the recommendation. The number of sets is preserved (`entry.sets.map`, not regenerating), so the user's earlier "+Add set" actions still hold. The `delete next.recommendation` branch covers swapping into a first-time exercise after a previously-recommended one.
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 4: Commit (lib only — UI wiring lands in Task 6)**
+- [x] **Step 4: Commit (lib only — UI wiring lands in Task 6)**
 
 ```bash
 git add src/lib/workout.js
@@ -678,7 +678,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/pages/Workout.jsx`
 
-- [ ] **Step 1: Update the `onReplace` callback**
+- [x] **Step 1: Update the `onReplace` callback**
 
 The current call site is around line 140:
 
@@ -698,17 +698,17 @@ onReplace={(entryId, newExerciseId) =>
 
 > `history` is already in scope from `const { addWorkout, workouts: history } = useWorkoutHistory();` near the top of the component. No new imports needed.
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Build passes**
+- [x] **Step 3: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 4: Manual probe — Smart Swap recomputes recommendation**
+- [x] **Step 4: Manual probe — Smart Swap recomputes recommendation**
 
 `npm run dev`. In the browser:
 
@@ -766,7 +766,7 @@ Expected: `recommendation: { source: "bodyweight", fromWeight: 0, fromReps: 15 }
 
 6. Cleanup: `localStorage.clear(); location.reload();`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/pages/Workout.jsx
