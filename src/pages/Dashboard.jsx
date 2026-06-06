@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Calendar, Dumbbell, Flame, Play, RotateCcw, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { RecoveryPanel } from "@/components/RecoveryPanel";
 import { StatsCard } from "@/components/StatsCard";
 import { WorkoutCard } from "@/components/WorkoutCard";
 import { useCurrentWorkout } from "@/hooks/useCurrentWorkout";
@@ -78,6 +79,8 @@ export default function Dashboard() {
           hint={stats.last ? new Date(stats.last).toLocaleDateString() : "No history yet"}
         />
       </div>
+
+      <RecoveryPanel history={workouts} />
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
