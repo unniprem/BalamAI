@@ -70,6 +70,7 @@ export function clearCurrentWorkout() {
 
 const DEFAULT_SETTINGS = {
   theme: "dark",
+  mode: "hypertrophy",
 };
 
 export function loadSettings() {
