@@ -11,6 +11,7 @@ import { generateWorkout } from "@/lib/workout";
 import { computeStreak, formatRelativeDate, lastWorkoutDate } from "@/lib/stats";
 import { MODE_ORDER, MODES } from "@/data/modes";
 import { loadSettings, saveSettings } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -91,6 +92,18 @@ export default function Dashboard() {
           role="radiogroup"
           aria-label="Training mode"
           className="flex rounded-lg border border-border/70 bg-muted/30 p-1"
+          onKeyDown={(e) => {
+            const idx = MODE_ORDER.indexOf(mode);
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+              e.preventDefault();
+              handleSelectMode(MODE_ORDER[(idx + 1) % MODE_ORDER.length]);
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+              e.preventDefault();
+              handleSelectMode(
+                MODE_ORDER[(idx - 1 + MODE_ORDER.length) % MODE_ORDER.length],
+              );
+            }
+          }}
         >
           {MODE_ORDER.map((id) => {
             const selected = id === mode;
@@ -100,13 +113,14 @@ export default function Dashboard() {
                 type="button"
                 role="radio"
                 aria-checked={selected}
+                tabIndex={selected ? 0 : -1}
                 onClick={() => handleSelectMode(id)}
-                className={
-                  "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors " +
-                  (selected
+                className={cn(
+                  "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                  selected
                     ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground")
-                }
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
                 {MODES[id].label}
               </button>
