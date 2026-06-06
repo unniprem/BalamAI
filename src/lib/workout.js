@@ -1,5 +1,6 @@
 import { CATEGORIES, EXERCISES, getExerciseById } from "@/data/exercises";
 import { getMode } from "@/data/modes";
+import { recommendForExercise } from "@/lib/overload";
 
 export function newId(prefix = "id") {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -9,7 +10,7 @@ function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-export function generateWorkout(previousWorkout, modeId) {
+export function generateWorkout(previousWorkout, modeId, history = []) {
   const mode = getMode(modeId);
   const previousIds = new Set(
     (previousWorkout?.exercises || []).map((e) => e.exerciseId),
@@ -19,22 +20,7 @@ export function generateWorkout(previousWorkout, modeId) {
     const pool = EXERCISES.filter((e) => e.category === category);
     const fresh = pool.filter((e) => !previousIds.has(e.id));
     const chosen = pickRandom(fresh.length > 0 ? fresh : pool);
-    return {
-      id: newId("ex"),
-      exerciseId: chosen.id,
-      prescription: {
-        repsMin: mode.repsMin,
-        repsMax: mode.repsMax,
-        restMin: mode.restMin,
-        restMax: mode.restMax,
-      },
-      sets: Array.from({ length: mode.sets }, () => ({
-        id: newId("set"),
-        weight: 0,
-        reps: 0,
-        completed: false,
-      })),
-    };
+    return buildEntry(chosen, mode, history);
   });
 
   return {
@@ -45,6 +31,39 @@ export function generateWorkout(previousWorkout, modeId) {
     mode: mode.id,
     exercises: picked,
   };
+}
+
+// Build a fresh exercise entry with prescription, recommended pre-fill values,
+// and an optional `recommendation` snapshot.
+function buildEntry(exerciseDef, mode, history) {
+  const rec = recommendForExercise(history, exerciseDef.id, mode.id, exerciseDef.increment);
+
+  const entry = {
+    id: newId("ex"),
+    exerciseId: exerciseDef.id,
+    prescription: {
+      repsMin: mode.repsMin,
+      repsMax: mode.repsMax,
+      restMin: mode.restMin,
+      restMax: mode.restMax,
+    },
+    sets: Array.from({ length: mode.sets }, () => ({
+      id: newId("set"),
+      weight: rec.weight,
+      reps: rec.reps,
+      completed: false,
+    })),
+  };
+
+  if (rec.source !== "first-time") {
+    entry.recommendation = {
+      source: rec.source,
+      fromWeight: rec.fromWeight,
+      fromReps: rec.fromReps,
+    };
+  }
+
+  return entry;
 }
 
 export function startWorkout(workout) {
