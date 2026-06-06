@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExerciseCard } from "@/components/ExerciseCard";
+import { RecoveryWarning } from "@/components/RecoveryWarning";
 import { useCurrentWorkout } from "@/hooks/useCurrentWorkout";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import {
@@ -76,6 +77,17 @@ export default function Workout() {
     navigate(`/history/${finished.id}`);
   }
 
+  function handleRecoveryRegenerate() {
+    if (!workout) return;
+    const fresh = generateWorkout(workout, workout.mode, history);
+    // Don't carry the dismissal flag across regeneration.
+    setWorkout(startWorkout(fresh));
+  }
+
+  function handleRecoveryKeep() {
+    update((prev) => (prev ? { ...prev, recoveryWarningDismissed: true } : prev));
+  }
+
   if (!workout) {
     return (
       <div className="flex flex-col gap-6">
@@ -124,6 +136,13 @@ export default function Workout() {
           Today's session
         </h1>
       </header>
+
+      <RecoveryWarning
+        workout={workout}
+        history={history}
+        onRegenerate={handleRecoveryRegenerate}
+        onKeep={handleRecoveryKeep}
+      />
 
       <div className="flex flex-col gap-3">
         {workout.exercises.map((entry) => (
