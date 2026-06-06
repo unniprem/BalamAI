@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { formatDuration } from "@/lib/workout";
 import { formatRelativeDate } from "@/lib/stats";
 import { getExerciseById, CATEGORY_LABELS } from "@/data/exercises";
+import { MODES } from "@/data/modes";
 import { cn } from "@/lib/utils";
 
 export function WorkoutHistoryCard({ workout, expanded, onToggle, onDelete }) {
@@ -25,7 +26,7 @@ export function WorkoutHistoryCard({ workout, expanded, onToggle, onDelete }) {
           className="flex w-full items-center justify-between gap-3 p-4 text-left"
         >
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold tracking-tight">
                 {formatRelativeDate(date)}
               </span>
@@ -36,6 +37,11 @@ export function WorkoutHistoryCard({ workout, expanded, onToggle, onDelete }) {
                   year: "numeric",
                 })}
               </span>
+              {workout.mode && MODES[workout.mode] ? (
+                <Badge variant="outline" className="text-[10px] uppercase">
+                  {MODES[workout.mode].label}
+                </Badge>
+              ) : null}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
               <span className="flex items-center gap-1">
