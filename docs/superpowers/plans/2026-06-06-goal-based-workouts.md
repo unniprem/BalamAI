@@ -803,7 +803,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 
 **Files:** none — verification only.
 
-- [ ] **Step 1: Clean lint + build**
+- [x] **Step 1: Clean lint + build**
 
 ```bash
 npm run lint
@@ -812,7 +812,7 @@ npm run build
 
 Both must pass with 0 errors / 0 warnings (warnings that pre-existed before V2 are acceptable; new ones are not).
 
-- [ ] **Step 2: End-to-end smoke checklist**
+- [x] **Step 2: End-to-end smoke checklist**
 
 `npm run dev`. Walk through each item — every box must check:
 
@@ -829,7 +829,7 @@ Both must pass with 0 errors / 0 warnings (warnings that pre-existed before V2 a
 8. **Legacy workout in history.** Inject one (spec §5; snippet in Task 7 step 6). History card renders without crash, no mode badge. Progress mode mix does NOT count it.
 9. **Legacy current workout.** Inject one (snippet in Task 5 step 6). Workout page renders without crash, no prescription line, no mode badge in the WorkoutCard preview.
 
-- [ ] **Step 3: No partial commits left**
+- [x] **Step 3: No partial commits left**
 
 ```bash
 git status
@@ -837,7 +837,7 @@ git status
 
 Expected: working tree clean except for any pre-existing un-V2 changes (MVP code that's been uncommitted since before this plan started).
 
-- [ ] **Step 4: Final marker commit (only if there are uncommitted V2 changes)**
+- [x] **Step 4: Final marker commit (only if there are uncommitted V2 changes)**
 
 If `git status` shows V2-related modifications you forgot to commit during the tasks above, group them now:
 
