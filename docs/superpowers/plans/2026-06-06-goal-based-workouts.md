@@ -112,7 +112,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/lib/storage.js:71-73`
 
-- [ ] **Step 1: Extend DEFAULT_SETTINGS**
+- [x] **Step 1: Extend DEFAULT_SETTINGS**
 
 In `src/lib/storage.js`, change the `DEFAULT_SETTINGS` constant from:
 
@@ -133,12 +133,12 @@ const DEFAULT_SETTINGS = {
 
 > Note: keep the value as a literal rather than importing `DEFAULT_MODE` from `src/data/modes.js` — avoids any future cyclic-import risk between `storage.js` and `modes.js`. The spec calls this out in §9.
 
-- [ ] **Step 2: Lint passes**
+- [x] **Step 2: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 3: Manual probe — defaults**
+- [x] **Step 3: Manual probe — defaults**
 
 Run the app: `npm run dev` then in a fresh browser tab DevTools console (or a fresh incognito window):
 
@@ -157,12 +157,12 @@ location.reload();
 
 For this task it's sufficient that lint + build pass; behavioural validation happens once the Dashboard toggle exists in Task 4.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/storage.js
@@ -176,7 +176,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/lib/workout.js:1-38`
 
-- [ ] **Step 1: Import mode helpers**
+- [x] **Step 1: Import mode helpers**
 
 At the top of `src/lib/workout.js`, change:
 
@@ -191,7 +191,7 @@ import { CATEGORIES, EXERCISES, getExerciseById } from "@/data/exercises";
 import { getMode } from "@/data/modes";
 ```
 
-- [ ] **Step 2: Update generateWorkout to accept and apply mode**
+- [x] **Step 2: Update generateWorkout to accept and apply mode**
 
 Replace the existing `generateWorkout` function (currently lines 11-38) with:
 
@@ -237,17 +237,17 @@ export function generateWorkout(previousWorkout, modeId) {
 
 Important: `replaceExercise`, `addSet`, `removeSet`, `updateSet`, `computeWorkoutVolume`, `finishWorkout`, and `workoutSummary` are **unchanged** — `prescription` lives on the entry, not on individual sets, so `addSet` cloning the last set works as-is.
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe — generation**
+- [x] **Step 5: Manual probe — generation**
 
 Start dev server: `npm run dev`.
 
@@ -265,7 +265,7 @@ Expected:
 - `w.exercises[0].prescription` has `repsMin: 8`, `repsMax: 12`, `restMin: 60`, `restMax: 90`.
 - `w.exercises[0].sets.length === 4`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/lib/workout.js
@@ -279,7 +279,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/pages/Dashboard.jsx`
 
-- [ ] **Step 1: Add imports**
+- [x] **Step 1: Add imports**
 
 In `src/pages/Dashboard.jsx`, add to the existing import block at the top:
 
@@ -307,7 +307,7 @@ import { MODE_ORDER, MODES } from "@/data/modes";
 import { loadSettings, saveSettings } from "@/lib/storage";
 ```
 
-- [ ] **Step 2: Add mode state via lazy initializer**
+- [x] **Step 2: Add mode state via lazy initializer**
 
 Inside the `Dashboard` function, immediately after `const { workouts } = useWorkoutHistory();`, add:
 
@@ -322,7 +322,7 @@ function handleSelectMode(nextMode) {
 
 > Why lazy init (`useState(() => ...)`) instead of `useEffect`: project memory documents `react-hooks/set-state-in-effect` blocking the load-from-localStorage pattern. Lazy initializer reads once at mount and writes through `saveSettings`.
 
-- [ ] **Step 3: Update handleGenerate to pass mode**
+- [x] **Step 3: Update handleGenerate to pass mode**
 
 Change:
 
@@ -346,7 +346,7 @@ function handleGenerate() {
 }
 ```
 
-- [ ] **Step 4: Render the segmented control**
+- [x] **Step 4: Render the segmented control**
 
 In the JSX, between the StatsCard grid (ends at `</div>` after the three StatsCards, currently line 70) and the `<Card className="border-border/80">` block, insert:
 
@@ -389,17 +389,17 @@ In the JSX, between the StatsCard grid (ends at `</div>` after the three StatsCa
 </div>
 ```
 
-- [ ] **Step 5: Lint passes**
+- [x] **Step 5: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors. If `react-hooks/set-state-in-effect` flags anything, you've used `useEffect` instead of the lazy initializer — go back to Step 2.
 
-- [ ] **Step 6: Build passes**
+- [x] **Step 6: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 7: Manual probe — toggle persists**
+- [x] **Step 7: Manual probe — toggle persists**
 
 Start `npm run dev`. In the browser:
 
@@ -409,7 +409,7 @@ Start `npm run dev`. In the browser:
 4. Click "Generate new". Then in DevTools: `JSON.parse(localStorage.getItem("balamai:current-workout")).mode` → `"strength"`. `.exercises[0].sets.length` → `5`. `.exercises[0].prescription.repsMin` → `3`.
 5. Switch to Fat Loss, Generate new. Confirm `sets.length === 3`, `repsMin === 12`, `restMin === 30`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add src/pages/Dashboard.jsx
@@ -423,7 +423,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/components/ExerciseCard.jsx`
 
-- [ ] **Step 1: Import formatters**
+- [x] **Step 1: Import formatters**
 
 Change the existing import line:
 
@@ -438,7 +438,7 @@ import { CATEGORY_LABELS, getExerciseById } from "@/data/exercises";
 import { formatRepRange, formatRestRange } from "@/data/modes";
 ```
 
-- [ ] **Step 2: Render the prescription line**
+- [x] **Step 2: Render the prescription line**
 
 In the `<CardHeader>` block, the existing structure is:
 
@@ -460,17 +460,17 @@ Immediately after that `<p>` (still inside the `<div className="min-w-0 flex-1">
 
 > Legacy workouts have no `entry.prescription` — line is omitted entirely (spec §5).
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe**
+- [x] **Step 5: Manual probe**
 
 Start `npm run dev`. On the Dashboard pick **Strength**, click Generate new (navigates to `/workout`). Each exercise card should show:
 
@@ -483,7 +483,7 @@ barbell · chest, triceps, front-delts
 Switch back, pick **Hypertrophy**, Generate new. Cards should show `4 sets · 8-12 reps · Rest 60-90s`.
 Switch to **Fat Loss**, Generate new. Cards should show `3 sets · 12-20 reps · Rest 30-45s`.
 
-- [ ] **Step 6: Manual probe — legacy workout**
+- [x] **Step 6: Manual probe — legacy workout**
 
 In DevTools, inject a workout missing `prescription`:
 
@@ -507,7 +507,7 @@ Navigate to `/workout`. The Bench Press card should render normally **without** 
 
 Clean up afterwards: click "Generate new" to overwrite the legacy entry.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/components/ExerciseCard.jsx
@@ -521,7 +521,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/components/WorkoutCard.jsx`
 
-- [ ] **Step 1: Import getMode**
+- [x] **Step 1: Import getMode**
 
 Change:
 
@@ -536,7 +536,7 @@ import { getExerciseById, CATEGORY_LABELS } from "@/data/exercises";
 import { MODES } from "@/data/modes";
 ```
 
-- [ ] **Step 2: Render the mode badge**
+- [x] **Step 2: Render the mode badge**
 
 In the `<CardHeader>` block, the existing inner `<div className="flex items-center justify-between">` contains `<CardTitle>` and the "N exercises" badge. Replace that entire `<div>` with:
 
@@ -556,23 +556,23 @@ In the `<CardHeader>` block, the existing inner `<div className="flex items-cent
 </div>
 ```
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe**
+- [x] **Step 5: Manual probe**
 
 `npm run dev`. On Dashboard, pick **Fat Loss** → Generate new → go back to Dashboard. The "Today's plan" card should show a `FAT LOSS` outline badge next to the title.
 
 Repeat with each mode to verify the label switches.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/WorkoutCard.jsx
@@ -586,7 +586,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/components/WorkoutHistoryCard.jsx`
 
-- [ ] **Step 1: Import MODES**
+- [x] **Step 1: Import MODES**
 
 Add below the existing data imports:
 
@@ -595,7 +595,7 @@ import { getExerciseById, CATEGORY_LABELS } from "@/data/exercises";
 import { MODES } from "@/data/modes";
 ```
 
-- [ ] **Step 2: Render the badge in the header row**
+- [x] **Step 2: Render the badge in the header row**
 
 The existing collapsed header row contains:
 
@@ -636,17 +636,17 @@ Replace it with:
 </div>
 ```
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe**
+- [x] **Step 5: Manual probe**
 
 `npm run dev`. Generate a workout in **Strength** mode, complete (or finish without completing sets — duration just needs to record), navigate to `/history`. The history card should show a `STRENGTH` badge alongside the date.
 
@@ -664,7 +664,7 @@ location.reload();
 
 Then navigate to `/history` and confirm the badge.
 
-- [ ] **Step 6: Legacy probe**
+- [x] **Step 6: Legacy probe**
 
 Inject a legacy workout into history:
 
@@ -684,7 +684,7 @@ location.reload();
 
 The legacy card should render normally with **no** mode badge.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/components/WorkoutHistoryCard.jsx
@@ -698,7 +698,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v2)
 **Files:**
 - Modify: `src/pages/Progress.jsx`
 
-- [ ] **Step 1: Import mode helpers**
+- [x] **Step 1: Import mode helpers**
 
 Add below the existing imports:
 
@@ -706,7 +706,7 @@ Add below the existing imports:
 import { MODE_ORDER, MODES } from "@/data/modes";
 ```
 
-- [ ] **Step 2: Compute mode counts in the summary memo**
+- [x] **Step 2: Compute mode counts in the summary memo**
 
 Replace the existing `useMemo` block (currently:
 
@@ -744,7 +744,7 @@ const summary = useMemo(() => {
 }, [workouts]);
 ```
 
-- [ ] **Step 3: Render the mode-mix card**
+- [x] **Step 3: Render the mode-mix card**
 
 Between the StatsCard grid (`</div>` after the three `<StatsCard>`s) and the `<Card className="border-border/80">` containing "Exercise frequency", insert:
 
@@ -771,17 +771,17 @@ Between the StatsCard grid (`</div>` after the three `<StatsCard>`s) and the `<C
 </Card>
 ```
 
-- [ ] **Step 4: Lint passes**
+- [x] **Step 4: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors.
 
-- [ ] **Step 5: Build passes**
+- [x] **Step 5: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 6: Manual probe**
+- [x] **Step 6: Manual probe**
 
 `npm run dev`. Navigate to `/progress`.
 
@@ -790,7 +790,7 @@ Expected: success.
 - Reload `/progress`. Counts should match.
 - Legacy workouts (no `mode`) should NOT appear in any bucket.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/pages/Progress.jsx
