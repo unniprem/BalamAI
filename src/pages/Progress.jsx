@@ -10,16 +10,27 @@ import {
   totalVolume,
 } from "@/lib/stats";
 import { CATEGORY_LABELS } from "@/data/exercises";
+import { MODE_ORDER, MODES } from "@/data/modes";
 
 export default function Progress() {
   const { workouts } = useWorkoutHistory();
 
   const summary = useMemo(() => {
+    const modeCounts = MODE_ORDER.reduce((acc, id) => {
+      acc[id] = 0;
+      return acc;
+    }, {});
+    for (const w of workouts) {
+      if (w.mode && modeCounts[w.mode] !== undefined) {
+        modeCounts[w.mode] += 1;
+      }
+    }
     return {
       total: workouts.length,
       volume: totalVolume(workouts),
       most: mostPerformedExercise(workouts),
       frequency: exerciseFrequency(workouts).slice(0, 10),
+      modeCounts,
     };
   }, [workouts]);
 
@@ -54,6 +65,27 @@ export default function Progress() {
           hint={summary.most ? `${summary.most.count} times` : "Log a workout to see"}
         />
       </div>
+
+      <Card className="border-border/80">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">By mode</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {MODE_ORDER.map((id) => (
+              <div
+                key={id}
+                className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/30 px-3 py-1.5 text-xs"
+              >
+                <span className="font-medium">{MODES[id].label}</span>
+                <span className="text-muted-foreground">
+                  {summary.modeCounts[id]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card className="border-border/80">
         <CardHeader className="pb-2">
