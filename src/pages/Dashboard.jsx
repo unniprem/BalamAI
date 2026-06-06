@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Calendar, Dumbbell, Flame, Play, RotateCcw, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,20 @@ import { useCurrentWorkout } from "@/hooks/useCurrentWorkout";
 import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
 import { generateWorkout } from "@/lib/workout";
 import { computeStreak, formatRelativeDate, lastWorkoutDate } from "@/lib/stats";
+import { MODE_ORDER, MODES } from "@/data/modes";
+import { loadSettings, saveSettings } from "@/lib/storage";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { workout, setWorkout } = useCurrentWorkout();
   const { workouts } = useWorkoutHistory();
+
+  const [mode, setMode] = useState(() => loadSettings().mode);
+
+  function handleSelectMode(nextMode) {
+    setMode(nextMode);
+    saveSettings({ mode: nextMode });
+  }
 
   const stats = useMemo(() => {
     const last = lastWorkoutDate(workouts);
@@ -26,7 +35,7 @@ export default function Dashboard() {
 
   function handleGenerate() {
     const previous = workouts[0] || workout;
-    const fresh = generateWorkout(previous);
+    const fresh = generateWorkout(previous, mode);
     setWorkout(fresh);
     navigate("/workout");
   }
@@ -67,6 +76,43 @@ export default function Dashboard() {
           value={formatRelativeDate(stats.last)}
           hint={stats.last ? new Date(stats.last).toLocaleDateString() : "No history yet"}
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Training mode
+          </span>
+          <span className="text-[11px] text-muted-foreground">
+            {MODES[mode].sets} sets · {MODES[mode].repsMin}-{MODES[mode].repsMax} reps
+          </span>
+        </div>
+        <div
+          role="radiogroup"
+          aria-label="Training mode"
+          className="flex rounded-lg border border-border/70 bg-muted/30 p-1"
+        >
+          {MODE_ORDER.map((id) => {
+            const selected = id === mode;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => handleSelectMode(id)}
+                className={
+                  "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors " +
+                  (selected
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {MODES[id].label}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <Card className="border-border/80">
