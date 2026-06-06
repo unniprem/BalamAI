@@ -780,7 +780,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 **Files:**
 - Modify: `src/components/ExerciseCard.jsx`
 
-- [ ] **Step 1: Inspect the current header structure**
+- [x] **Step 1: Inspect the current header structure**
 
 Open `src/components/ExerciseCard.jsx` and locate the `<CardHeader>` block. The V2 prescription line was inserted as:
 
@@ -794,7 +794,7 @@ Open `src/components/ExerciseCard.jsx` and locate the `<CardHeader>` block. The 
 
 The recommendation line goes immediately after this `<p>` (still inside the same `<div className="min-w-0 flex-1">`).
 
-- [ ] **Step 2: Add the recommendation render**
+- [x] **Step 2: Add the recommendation render**
 
 Immediately after the closing `)}` of the prescription block above, insert:
 
@@ -830,17 +830,17 @@ Immediately after the closing `)}` of the prescription block above, insert:
 
 > Numbers render with native JS `toString()` — `60` shows as `"60"`, `62.5` shows as `"62.5"`. No `toFixed` is desired.
 
-- [ ] **Step 3: Lint passes**
+- [x] **Step 3: Lint passes**
 
 Run: `npm run lint`
 Expected: 0 errors. Note: the IIFE pattern (`(() => { ... })()`) is intentional to keep the conditional rendering colocated; if `react/jsx-no-leaked-render` or similar rules complain, switch to a small named function above the JSX block.
 
-- [ ] **Step 4: Build passes**
+- [x] **Step 4: Build passes**
 
 Run: `npm run build`
 Expected: success.
 
-- [ ] **Step 5: Manual probe — bumped (green ↑)**
+- [x] **Step 5: Manual probe — bumped (green ↑)**
 
 `npm run dev`. In the browser:
 
@@ -855,7 +855,7 @@ Expected: success.
 
 The text should be green (emerald-500).
 
-- [ ] **Step 6: Manual probe — hold (muted →)**
+- [x] **Step 6: Manual probe — hold (muted →)**
 
 In DevTools, with the bump history seeded, edit the past workout so reps drop below 12:
 
@@ -875,7 +875,7 @@ Generate new. On the Bench Press card (re-roll if needed):
 
 Text should be muted (text-muted-foreground, not green).
 
-- [ ] **Step 7: Manual probe — bodyweight**
+- [x] **Step 7: Manual probe — bodyweight**
 
 Replace the seeded history with the push-up bodyweight history:
 
@@ -906,11 +906,11 @@ Generate new. On a Push-Up card if it appears (regenerate if push picks somethin
 → 18 reps — last 18 reps
 ```
 
-- [ ] **Step 8: Manual probe — first-time renders nothing extra**
+- [x] **Step 8: Manual probe — first-time renders nothing extra**
 
 `localStorage.clear(); location.reload();`. Generate new. No card should have a third line beneath the prescription line. The cards should look exactly like they did at the end of V2.
 
-- [ ] **Step 9: Manual probe — legacy V2 entry stays clean**
+- [x] **Step 9: Manual probe — legacy V2 entry stays clean**
 
 Inject a current workout that has prescription but no recommendation (V2 shape):
 
@@ -936,7 +936,7 @@ Navigate to `/workout`. The Bench Press card should render its prescription line
 
 Cleanup: `localStorage.clear(); location.reload();`.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add src/components/ExerciseCard.jsx
@@ -949,7 +949,7 @@ git -c user.email="unnik@switchpt.com" -c user.name="Unni K" commit -m "feat(v3)
 
 **Files:** none — verification only.
 
-- [ ] **Step 1: Clean lint + build**
+- [x] **Step 1: Clean lint + build**
 
 ```bash
 npm run lint
@@ -958,7 +958,7 @@ npm run build
 
 Both must pass with 0 errors. Warnings that pre-existed before V3 are acceptable; new ones are not.
 
-- [ ] **Step 2: End-to-end smoke checklist**
+- [x] **Step 2: End-to-end smoke checklist**
 
 `npm run dev`. Walk the following — every box must check:
 
@@ -973,7 +973,7 @@ Both must pass with 0 errors. Warnings that pre-existed before V3 are acceptable
 9. **Legacy pre-V2 workout in history.** Inject `{ exercises: [{exerciseId: "bench-press", sets: [{weight: 60, reps: 12, completed: true}]}] }` (no `mode`, no `prescription`) into `balamai:workouts`. Generate new. Bench Press recommendation should be `first-time` (no line, sets at 0). No crash.
 10. **Legacy V2 workout (no recommendation) in current workout.** Inject the snippet from Task 7 Step 9. `/workout` renders cleanly with prescription line, no recommendation line, no crash.
 
-- [ ] **Step 3: No partial commits left**
+- [x] **Step 3: No partial commits left**
 
 ```bash
 git status
@@ -981,7 +981,7 @@ git status
 
 Expected: working tree clean.
 
-- [ ] **Step 4: Final marker commit (only if V3 changes remain uncommitted)**
+- [x] **Step 4: Final marker commit (only if V3 changes remain uncommitted)**
 
 If `git status` shows V3-related modifications grouped from a probe gone wrong, commit them:
 
