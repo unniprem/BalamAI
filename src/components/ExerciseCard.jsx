@@ -35,6 +35,33 @@ export function ExerciseCard({ entry, onUpdateSet, onAddSet, onRemoveSet, onRepl
                   {entry.sets.length} sets · {formatRepRange(entry.prescription)} reps · Rest {formatRestRange(entry.prescription)}
                 </p>
               ) : null}
+              {entry.recommendation ? (() => {
+                const r = entry.recommendation;
+                const targetWeight = entry.sets[0]?.weight ?? 0;
+                const targetReps = entry.sets[0]?.reps ?? 0;
+                if (r.source === "bumped") {
+                  return (
+                    <p className="mt-1 text-[11px] font-medium text-emerald-500">
+                      ↑ {targetWeight}kg × {targetReps} — last {r.fromWeight}kg × {r.fromReps}
+                    </p>
+                  );
+                }
+                if (r.source === "hold") {
+                  return (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      → {targetWeight}kg × {targetReps} — last {r.fromWeight}kg × {r.fromReps}
+                    </p>
+                  );
+                }
+                if (r.source === "bodyweight") {
+                  return (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      → {targetReps} reps — last {r.fromReps} reps
+                    </p>
+                  );
+                }
+                return null;
+              })() : null}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
