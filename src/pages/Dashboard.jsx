@@ -36,7 +36,7 @@ export default function Dashboard() {
 
   function handleGenerate() {
     const previous = workouts[0] || workout;
-    const fresh = generateWorkout(previous, mode);
+    const fresh = generateWorkout(previous, mode, workouts);
     setWorkout(fresh);
     navigate("/workout");
   }
