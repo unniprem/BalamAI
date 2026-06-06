@@ -1,4 +1,5 @@
 import { CATEGORIES, EXERCISES, getExerciseById } from "@/data/exercises";
+import { getMode } from "@/data/modes";
 
 export function newId(prefix = "id") {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -8,7 +9,8 @@ function pickRandom(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-export function generateWorkout(previousWorkout) {
+export function generateWorkout(previousWorkout, modeId) {
+  const mode = getMode(modeId);
   const previousIds = new Set(
     (previousWorkout?.exercises || []).map((e) => e.exerciseId),
   );
@@ -20,11 +22,18 @@ export function generateWorkout(previousWorkout) {
     return {
       id: newId("ex"),
       exerciseId: chosen.id,
-      sets: [
-        { id: newId("set"), weight: 0, reps: 0, completed: false },
-        { id: newId("set"), weight: 0, reps: 0, completed: false },
-        { id: newId("set"), weight: 0, reps: 0, completed: false },
-      ],
+      prescription: {
+        repsMin: mode.repsMin,
+        repsMax: mode.repsMax,
+        restMin: mode.restMin,
+        restMax: mode.restMax,
+      },
+      sets: Array.from({ length: mode.sets }, () => ({
+        id: newId("set"),
+        weight: 0,
+        reps: 0,
+        completed: false,
+      })),
     };
   });
 
@@ -33,6 +42,7 @@ export function generateWorkout(previousWorkout) {
     createdAt: new Date().toISOString(),
     startedAt: null,
     completedAt: null,
+    mode: mode.id,
     exercises: picked,
   };
 }
