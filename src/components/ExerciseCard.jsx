@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { SetTracker } from "@/components/SetTracker";
 import { ReplaceExerciseDialog } from "@/components/ReplaceExerciseDialog";
 import { CATEGORY_LABELS, getExerciseById } from "@/data/exercises";
+import { formatRepRange, formatRestRange } from "@/data/modes";
 
 export function ExerciseCard({ entry, onUpdateSet, onAddSet, onRemoveSet, onReplace }) {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -29,6 +30,11 @@ export function ExerciseCard({ entry, onUpdateSet, onAddSet, onRemoveSet, onRepl
               <p className="mt-1 text-[11px] text-muted-foreground">
                 {exercise.equipment.join(" · ")} · {exercise.muscles.slice(0, 3).join(", ")}
               </p>
+              {entry.prescription ? (
+                <p className="mt-1 text-[11px] font-medium text-foreground/80">
+                  {entry.sets.length} sets · {formatRepRange(entry.prescription)} reps · Rest {formatRestRange(entry.prescription)}
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
