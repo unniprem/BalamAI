@@ -28,7 +28,7 @@ function AppShell({ children }) {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/BalamAI">
       <AppShell>
         <Routes>
           <Route path="/" element={<Dashboard />} />
