@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { loadWorkouts, loadSettings } from "../lib/storage";
 import { TrendingUp, Flame, Dumbbell, BarChart3, PieChart, Info } from "lucide-react";
+import { getExerciseDisplayCategory } from "../lib/workout";
 
 export default function Progress() {
   const [workouts] = useState(() => loadWorkouts());
@@ -20,8 +21,9 @@ export default function Progress() {
   const categoryCounts = workouts.reduce((acc, curr) => {
     if (curr.exercises) {
       curr.exercises.forEach((ex) => {
-        if (ex.completed && ex.category) {
-          acc[ex.category] = (acc[ex.category] || 0) + 1;
+        if (ex.completed) {
+          const displayCat = getExerciseDisplayCategory(ex);
+          acc[displayCat] = (acc[displayCat] || 0) + 1;
         }
       });
     }
@@ -51,10 +53,11 @@ export default function Progress() {
   );
 
   // Standard categories
-  const categories = ["push", "pull", "legs", "shoulders", "core"];
+  const categories = ["chest", "back", "arms", "legs", "shoulders", "core"];
   const categoryColors = {
-    push: "bg-cyan-500",
-    pull: "bg-blue-500",
+    chest: "bg-cyan-500",
+    back: "bg-blue-500",
+    arms: "bg-pink-500",
     legs: "bg-emerald-500",
     shoulders: "bg-purple-500",
     core: "bg-orange-500",

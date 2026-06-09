@@ -1,4 +1,5 @@
 import { Check, RotateCw, ExternalLink, Play } from "lucide-react";
+import { getExerciseDisplayCategory } from "../lib/workout";
 
 export default function ExerciseCard({
   exercise,
@@ -48,7 +49,7 @@ export default function ExerciseCard({
           )}
           {/* Tag badge on top of image */}
           <span className="absolute top-2 left-2 rounded-lg bg-zinc-950/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-450 border border-zinc-800 backdrop-blur-xs">
-            {exercise.category}
+            {getExerciseDisplayCategory(exercise)}
           </span>
         </div>
 

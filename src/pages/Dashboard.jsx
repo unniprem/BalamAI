@@ -595,6 +595,7 @@ export default function Dashboard() {
           currentExercise={swapTarget}
           onSelect={handleSwapExercise}
           allowedEquipment={settings.equipment}
+          focusCategories={activeDay?.focus}
         />
       )}
 

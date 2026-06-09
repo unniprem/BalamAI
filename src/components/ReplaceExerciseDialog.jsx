@@ -8,6 +8,7 @@ import {
 } from "./ui/dialog";
 import { exercises } from "../data/exercises";
 import { Search, RotateCw, Sparkles } from "lucide-react";
+import { exerciseMatchesFocus } from "../lib/workout";
 
 export default function ReplaceExerciseDialog({
   isOpen,
@@ -15,20 +16,28 @@ export default function ReplaceExerciseDialog({
   currentExercise,
   onSelect,
   allowedEquipment = [],
+  focusCategories = [],
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEquipment, setSelectedEquipment] = useState("all");
 
-  const category = currentExercise?.category || "";
   const currentId = currentExercise?.id || "";
 
-  // Filter exercises that belong to the same category and are not the current exercise
+  // Determine which focus category of the day matches the current exercise
+  const focus = useMemo(() => {
+    if (!currentExercise || !focusCategories || focusCategories.length === 0) {
+      return currentExercise?.category || "";
+    }
+    return focusCategories.find(f => exerciseMatchesFocus(currentExercise, f)) || currentExercise.category;
+  }, [currentExercise, focusCategories]);
+
+  // Filter exercises that belong to the same focus category and are not the current exercise
   const alternatives = useMemo(() => {
-    if (!category) return [];
+    if (!focus) return [];
     
     return exercises.filter((ex) => {
-      // Must be same category
-      if (ex.category !== category) return false;
+      // Must match the focus
+      if (!exerciseMatchesFocus(ex, focus)) return false;
       // Cannot be the active one
       if (ex.id === currentId) return false;
       
@@ -74,7 +83,7 @@ export default function ReplaceExerciseDialog({
             Swap Exercise
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Replace <span className="text-white font-medium">{currentExercise.name}</span> with a matching <span className="text-emerald-450 font-medium">{category.toUpperCase()}</span> alternative.
+            Replace <span className="text-white font-medium">{currentExercise.name}</span> with a matching <span className="text-emerald-450 font-medium">{focus.toUpperCase()}</span> alternative.
           </DialogDescription>
         </DialogHeader>
 

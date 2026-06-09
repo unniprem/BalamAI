@@ -1,4 +1,59 @@
-import { exercises } from "../data/exercises";
+import { exercises } from "../data/exercises.js";
+
+/**
+ * Checks if an exercise matches a given focus category.
+ * Supports both split categories ("push", "pull", "legs", "shoulders", "core")
+ * and specific muscle group splits ("chest", "back", "arms").
+ * @param {Object} exercise
+ * @param {string} focus
+ * @returns {boolean}
+ */
+export function exerciseMatchesFocus(exercise, focus) {
+  if (focus === "push") {
+    return exercise.category === "push";
+  }
+  if (focus === "pull") {
+    return exercise.category === "pull";
+  }
+  if (focus === "legs") {
+    return exercise.category === "legs";
+  }
+  if (focus === "shoulders") {
+    return exercise.category === "shoulders" || exercise.muscles.some(m => ["shoulders", "deltoids", "rear deltoids", "delts"].includes(m));
+  }
+  if (focus === "core") {
+    return exercise.category === "core" || exercise.muscles.some(m => ["core", "abs", "obliques", "lower abs"].includes(m));
+  }
+
+  // Bro-split / muscle group matching
+  if (focus === "chest") {
+    return exercise.category === "push" && exercise.muscles.some(m => ["chest", "pectorals", "upper chest"].includes(m));
+  }
+  if (focus === "back") {
+    return exercise.category === "pull" && exercise.muscles.some(m => ["back", "lats", "rhomboids", "traps", "trapezius", "upper back", "lower back"].includes(m));
+  }
+  if (focus === "arms") {
+    return (exercise.category === "push" || exercise.category === "pull") && exercise.muscles.some(m => ["biceps", "triceps", "forearms"].includes(m));
+  }
+
+  return false;
+}
+
+/**
+ * Returns a display category for an exercise matching chest, back, arms, shoulders, legs, core.
+ * Falls back to base database category.
+ * @param {Object} exercise
+ * @returns {string}
+ */
+export function getExerciseDisplayCategory(exercise) {
+  if (exercise.category === "legs") return "legs";
+  if (exercise.category === "core") return "core";
+  if (exercise.category === "shoulders" || exercise.muscles.some(m => ["shoulders", "deltoids", "rear deltoids", "delts"].includes(m))) return "shoulders";
+  if (exercise.category === "push" && exercise.muscles.some(m => ["chest", "pectorals", "upper chest"].includes(m))) return "chest";
+  if (exercise.category === "pull" && exercise.muscles.some(m => ["back", "lats", "rhomboids", "traps", "trapezius", "upper back", "lower back"].includes(m))) return "back";
+  if (exercise.muscles.some(m => ["biceps", "triceps", "forearms"].includes(m))) return "arms";
+  return exercise.category;
+}
 
 /**
  * Returns the layout of focuses for each day of the week based on days count and split type.
@@ -12,26 +67,26 @@ export function getWeeklySplitLayout(split, days) {
   // Helper to construct days
   if (split === "bro") {
     if (days === 3) {
-      layout.push({ name: "Day 1", focus: ["push", "shoulders"], rest: false });
-      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 1", focus: ["chest", "back"], rest: false });
+      layout.push({ name: "Day 2", focus: ["shoulders", "arms"], rest: false });
       layout.push({ name: "Day 3", focus: ["legs", "core"], rest: false });
     } else if (days === 4) {
-      layout.push({ name: "Day 1", focus: ["push"], rest: false });
-      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 1", focus: ["chest", "back"], rest: false });
+      layout.push({ name: "Day 2", focus: ["shoulders", "core"], rest: false });
       layout.push({ name: "Day 3", focus: ["legs"], rest: false });
-      layout.push({ name: "Day 4", focus: ["shoulders", "core"], rest: false });
+      layout.push({ name: "Day 4", focus: ["arms"], rest: false });
     } else if (days === 5) {
-      layout.push({ name: "Day 1", focus: ["push"], rest: false });
-      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
-      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
-      layout.push({ name: "Day 4", focus: ["shoulders"], rest: false });
-      layout.push({ name: "Day 5", focus: ["core"], rest: false });
+      layout.push({ name: "Day 1", focus: ["chest"], rest: false });
+      layout.push({ name: "Day 2", focus: ["back"], rest: false });
+      layout.push({ name: "Day 3", focus: ["shoulders"], rest: false });
+      layout.push({ name: "Day 4", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 5", focus: ["arms"], rest: false });
     } else { // 6 days
-      layout.push({ name: "Day 1", focus: ["push"], rest: false });
-      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
-      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
-      layout.push({ name: "Day 4", focus: ["shoulders"], rest: false });
-      layout.push({ name: "Day 5", focus: ["pull"], rest: false }); // repeat pull
+      layout.push({ name: "Day 1", focus: ["chest"], rest: false });
+      layout.push({ name: "Day 2", focus: ["back"], rest: false });
+      layout.push({ name: "Day 3", focus: ["shoulders"], rest: false });
+      layout.push({ name: "Day 4", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 5", focus: ["arms"], rest: false });
       layout.push({ name: "Day 6", focus: ["core"], rest: false });
     }
   } else if (split === "push-pull") {
@@ -129,7 +184,9 @@ export function generateExercisesForFocus(focusCategories, count, allowedEquipme
   if (!focusCategories || focusCategories.length === 0) return [];
 
   // Filter the exercises matching any of the focus categories
-  let pool = exercises.filter(ex => focusCategories.includes(ex.category));
+  let pool = exercises.filter(ex =>
+    focusCategories.some(focus => exerciseMatchesFocus(ex, focus))
+  );
   
   // Apply equipment filtering if settings are present
   if (allowedEquipment && allowedEquipment.length > 0) {
@@ -149,9 +206,9 @@ export function generateExercisesForFocus(focusCategories, count, allowedEquipme
   const selectedIds = new Set();
 
   if (focusCategories.length > 1) {
-    // Try to pick one from each category first
+    // Try to pick one from each focus category first
     focusCategories.forEach(cat => {
-      const match = shuffled.find(ex => ex.category === cat && !selectedIds.has(ex.id));
+      const match = shuffled.find(ex => exerciseMatchesFocus(ex, cat) && !selectedIds.has(ex.id));
       if (match) {
         result.push({ ...match, completed: false });
         selectedIds.add(match.id);
