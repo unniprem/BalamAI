@@ -121,7 +121,8 @@ export function loadSettings() {
     days: 5,                  // 3, 4, 5, or 6 days
     split: "push-pull",       // "bro", "push-pull", "other"
     goal: "strength",         // "lose-fat", "strength", "general"
-    exerciseCount: 5          // 4, 5, or 6
+    exerciseCount: 5,         // 4, 5, or 6
+    equipment: ["barbell", "dumbbell", "machine", "cable", "bodyweight"]
   };
   
   // Merge stored settings with defaults to ensure all keys exist

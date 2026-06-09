@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { loadWorkouts } from "../lib/storage";
 import { Calendar, Clock, Dumbbell, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 
 export default function History() {
-  const [workouts, setWorkouts] = useState([]);
+  const [workouts, setWorkouts] = useState(() => loadWorkouts());
   const [expandedId, setExpandedId] = useState(null);
-
-  useEffect(() => {
-    setWorkouts(loadWorkouts());
-  }, []);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);

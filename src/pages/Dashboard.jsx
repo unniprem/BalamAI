@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { exercises } from "../data/exercises";
 import {
   loadSettings,
   saveSettings,
   saveWorkout,
-  loadWorkouts,
 } from "../lib/storage";
 import {
   getWeeklySplitLayout,
@@ -17,20 +16,38 @@ import ReplaceExerciseDialog from "../components/ReplaceExerciseDialog";
 import {
   Settings,
   Calendar,
-  Flame,
   RotateCw,
   Trophy,
   Activity,
-  Play,
   CheckCircle2,
   Clock,
-  Sparkles,
 } from "lucide-react";
 
 export default function Dashboard() {
   // --- State ---
   const [settings, setSettings] = useState(() => loadSettings());
-  const [weeklySchedule, setWeeklySchedule] = useState([]);
+  const [weeklySchedule, setWeeklySchedule] = useState(() => {
+    const storedSchedule = localStorage.getItem("balamai_weekly_schedule");
+    const storedSettingsString = localStorage.getItem("balamai_stored_settings_key");
+    const initialSettings = loadSettings();
+    const settingsStr = JSON.stringify(initialSettings);
+    
+    if (storedSchedule && storedSettingsString === settingsStr) {
+      return JSON.parse(storedSchedule);
+    } else {
+      const layout = getWeeklySplitLayout(initialSettings.split, initialSettings.days);
+      const fullSchedule = layout.map((day) => {
+        if (day.rest) return { ...day, exercises: [] };
+        return {
+          ...day,
+          exercises: generateExercisesForFocus(day.focus, initialSettings.exerciseCount, initialSettings.equipment),
+        };
+      });
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(fullSchedule));
+      localStorage.setItem("balamai_stored_settings_key", settingsStr);
+      return fullSchedule;
+    }
+  });
   const [activeDayId, setActiveDayId] = useState("day-1");
   const [showSettings, setShowSettings] = useState(false);
   const [swapTarget, setSwapTarget] = useState(null); // exercise to swap
@@ -43,22 +60,6 @@ export default function Dashboard() {
   // Success Modal State
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState(null);
-
-  // --- Initial Layout and Loading ---
-  useEffect(() => {
-    // Check if we already have a generated schedule in LocalStorage
-    const storedSchedule = localStorage.getItem("balamai_weekly_schedule");
-    const storedSettingsString = localStorage.getItem("balamai_stored_settings_key");
-    
-    const settingsStr = JSON.stringify(settings);
-    
-    if (storedSchedule && storedSettingsString === settingsStr) {
-      setWeeklySchedule(JSON.parse(storedSchedule));
-    } else {
-      // Regenerate schedule
-      regenerateWholeSchedule(settings);
-    }
-  }, [settings]);
 
   // Handle active workout state timer
   useEffect(() => {
@@ -75,14 +76,14 @@ export default function Dashboard() {
   }, [workoutActive]);
 
   // Format active timer string
-  const formatTime = (secs) => {
+  const formatTime = useCallback((secs) => {
     const mins = Math.floor(secs / 60);
     const remainingSecs = secs % 60;
     return `${mins}:${remainingSecs < 10 ? "0" : ""}${remainingSecs}`;
-  };
+  }, []);
 
   // --- Schedule Generation ---
-  const regenerateWholeSchedule = (currentSettings) => {
+  const regenerateWholeSchedule = useCallback((currentSettings) => {
     const layout = getWeeklySplitLayout(currentSettings.split, currentSettings.days);
     
     // For each active day, generate a list of exercises
@@ -92,7 +93,7 @@ export default function Dashboard() {
       }
       return {
         ...day,
-        exercises: generateExercisesForFocus(day.focus, currentSettings.exerciseCount),
+        exercises: generateExercisesForFocus(day.focus, currentSettings.exerciseCount, currentSettings.equipment),
       };
     });
 
@@ -105,88 +106,98 @@ export default function Dashboard() {
     if (firstActive) {
       setActiveDayId(firstActive.id);
     }
-  };
+  }, []);
 
-  const regenerateSpecificDay = (dayId) => {
-    const updated = weeklySchedule.map((day) => {
-      if (day.id === dayId) {
-        return {
-          ...day,
-          exercises: generateExercisesForFocus(day.focus, settings.exerciseCount),
-        };
-      }
-      return day;
+  const regenerateSpecificDay = useCallback((dayId) => {
+    setWeeklySchedule((prevSchedule) => {
+      const updated = prevSchedule.map((day) => {
+        if (day.id === dayId) {
+          return {
+            ...day,
+            exercises: generateExercisesForFocus(day.focus, settings.exerciseCount, settings.equipment),
+          };
+        }
+        return day;
+      });
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
     });
-    setWeeklySchedule(updated);
-    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
-  };
+  }, [settings.exerciseCount, settings.equipment]);
 
   // --- Setting Change Handlers ---
-  const handleSettingChange = (key, value) => {
-    const updatedSettings = { ...settings, [key]: value };
-    setSettings(updatedSettings);
-    saveSettings(updatedSettings);
-    
-    // Reset timer
-    setWorkoutActive(false);
-    setSecondsElapsed(0);
-  };
+  const handleSettingChange = useCallback((key, value) => {
+    setSettings((prevSettings) => {
+      const updatedSettings = { ...prevSettings, [key]: value };
+      saveSettings(updatedSettings);
+      
+      // Reset timer
+      setWorkoutActive(false);
+      setSecondsElapsed(0);
+
+      // Regenerate schedule
+      regenerateWholeSchedule(updatedSettings);
+      
+      return updatedSettings;
+    });
+  }, [regenerateWholeSchedule]);
 
   // --- Workout Actions ---
   const activeDay = weeklySchedule.find((d) => d.id === activeDayId) || null;
   const isRestDay = activeDay?.rest || false;
 
-  const handleToggleComplete = (exerciseId) => {
+  const handleToggleComplete = useCallback((exerciseId) => {
     // Automatically trigger timer start when checking the first exercise
     if (!workoutActive && secondsElapsed === 0) {
       setWorkoutActive(true);
     }
 
-    const updated = weeklySchedule.map((day) => {
-      if (day.id === activeDayId) {
-        return {
-          ...day,
-          exercises: day.exercises.map((ex) =>
-            ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
-          ),
-        };
-      }
-      return day;
+    setWeeklySchedule((prevSchedule) => {
+      const updated = prevSchedule.map((day) => {
+        if (day.id === activeDayId) {
+          return {
+            ...day,
+            exercises: day.exercises.map((ex) =>
+              ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
+            ),
+          };
+        }
+        return day;
+      });
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
     });
+  }, [activeDayId, workoutActive, secondsElapsed]);
 
-    setWeeklySchedule(updated);
-    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
-  };
-
-  const handleSwapExercise = (newExerciseId) => {
+  const handleSwapExercise = useCallback((newExerciseId) => {
     const newExTemplate = exercises.find((ex) => ex.id === newExerciseId);
     if (!newExTemplate) return;
 
-    const updated = weeklySchedule.map((day) => {
-      if (day.id === activeDayId) {
-        return {
-          ...day,
-          exercises: day.exercises.map((ex) =>
-            ex.id === swapTarget.id
-              ? {
-                  ...newExTemplate,
-                  // Preserve key elements but swap templates
-                  id: `${newExTemplate.id}-${Date.now()}`,
-                  completed: false,
-                }
-              : ex
-          ),
-        };
-      }
-      return day;
+    setWeeklySchedule((prevSchedule) => {
+      const updated = prevSchedule.map((day) => {
+        if (day.id === activeDayId) {
+          return {
+            ...day,
+            exercises: day.exercises.map((ex) =>
+              ex.id === swapTarget?.id
+                ? {
+                    ...newExTemplate,
+                    // Preserve key elements but swap templates
+                    id: `${newExTemplate.id}-${Date.now()}`,
+                    completed: false,
+                  }
+                : ex
+            ),
+          };
+        }
+        return day;
+      });
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
     });
-
-    setWeeklySchedule(updated);
-    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
     setSwapTarget(null);
-  };
+  }, [activeDayId, swapTarget]);
 
-  const handleFinishWorkout = () => {
+  const handleFinishWorkout = useCallback(() => {
     if (!activeDay || isRestDay) return;
     
     const completed = activeDay.exercises.filter((ex) => ex.completed);
@@ -224,24 +235,26 @@ export default function Dashboard() {
     setShowSuccessModal(true);
 
     // Reset day's exercise checkmarks
-    const updated = weeklySchedule.map((day) => {
-      if (day.id === activeDayId) {
-        return {
-          ...day,
-          exercises: day.exercises.map((ex) => ({ ...ex, completed: false })),
-        };
-      }
-      return day;
+    setWeeklySchedule((prevSchedule) => {
+      const updated = prevSchedule.map((day) => {
+        if (day.id === activeDayId) {
+          return {
+            ...day,
+            exercises: day.exercises.map((ex) => ({ ...ex, completed: false })),
+          };
+        }
+        return day;
+      });
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
     });
-    setWeeklySchedule(updated);
-    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
     
     // Reset timer state
     setSecondsElapsed(0);
     
     // Update settings in state to reflect new streak
     setSettings(loadSettings());
-  };
+  }, [activeDay, isRestDay, secondsElapsed, settings, activeDayId, formatTime]);
 
   // Calculate completion percentage
   const activeCompletedCount = activeDay?.exercises?.filter((e) => e.completed)?.length || 0;
@@ -350,6 +363,47 @@ export default function Dashboard() {
                 <option value="6">6 Exercises</option>
                 <option value="7">7 Exercises</option>
               </select>
+            </div>
+          </div>
+
+          {/* Equipment Availability Selection */}
+          <div className="mt-6 border-t border-zinc-900 pt-5 space-y-3">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Available Equipment
+              </label>
+              <span className="text-[10px] text-zinc-550">
+                Limit your generated routines and exercise swaps to equipment you actually have.
+              </span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {["barbell", "dumbbell", "machine", "cable", "bodyweight"].map((eq) => {
+                const isSelected = settings.equipment?.includes(eq) ?? true;
+                return (
+                  <button
+                    key={eq}
+                    type="button"
+                    onClick={() => {
+                      const currentEq = settings.equipment || ["barbell", "dumbbell", "machine", "cable", "bodyweight"];
+                      let nextEq;
+                      if (isSelected) {
+                        if (currentEq.length <= 1) return; // don't allow empty
+                        nextEq = currentEq.filter((item) => item !== eq);
+                      } else {
+                        nextEq = [...currentEq, eq];
+                      }
+                      handleSettingChange("equipment", nextEq);
+                    }}
+                    className={`rounded-xl px-3.5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300 border ${
+                      isSelected
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        : "bg-zinc-900/40 text-zinc-400 border-zinc-850 hover:bg-zinc-800/60 hover:text-white"
+                    }`}
+                  >
+                    {eq}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -540,6 +594,7 @@ export default function Dashboard() {
           onClose={() => setSwapTarget(null)}
           currentExercise={swapTarget}
           onSelect={handleSwapExercise}
+          allowedEquipment={settings.equipment}
         />
       )}
 

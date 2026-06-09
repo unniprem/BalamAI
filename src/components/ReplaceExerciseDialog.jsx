@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ export default function ReplaceExerciseDialog({
   onClose,
   currentExercise,
   onSelect,
+  allowedEquipment = [],
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEquipment, setSelectedEquipment] = useState("all");
@@ -31,6 +32,15 @@ export default function ReplaceExerciseDialog({
       // Cannot be the active one
       if (ex.id === currentId) return false;
       
+      // Filter by user's available equipment settings
+      if (
+        allowedEquipment &&
+        allowedEquipment.length > 0 &&
+        !allowedEquipment.includes(ex.equipment)
+      ) {
+        return false;
+      }
+      
       // Filter by search query
       if (
         searchQuery &&
@@ -39,16 +49,21 @@ export default function ReplaceExerciseDialog({
         return false;
       }
       
-      // Filter by equipment
+      // Filter by equipment button select
       if (selectedEquipment !== "all" && ex.equipment !== selectedEquipment) {
         return false;
       }
       
       return true;
     });
-  }, [category, currentId, searchQuery, selectedEquipment]);
+  }, [category, currentId, searchQuery, selectedEquipment, allowedEquipment]);
 
   if (!currentExercise) return null;
+
+  // Render filter buttons: "all" + only the equipment types allowed by settings
+  const renderPills = ["all", ...(["barbell", "dumbbell", "machine", "cable", "bodyweight"].filter(
+    (e) => !allowedEquipment || allowedEquipment.length === 0 || allowedEquipment.includes(e)
+  ))];
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -79,7 +94,7 @@ export default function ReplaceExerciseDialog({
 
           {/* Equipment Pills */}
           <div className="flex flex-wrap gap-1.5">
-            {["all", "barbell", "dumbbell", "machine", "cable", "bodyweight"].map(
+            {renderPills.map(
               (eq) => (
                 <button
                   key={eq}

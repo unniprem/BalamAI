@@ -1,5 +1,4 @@
-import React from "react";
-import { Check, RotateCw, ExternalLink, Play, Sparkles } from "lucide-react";
+import { Check, RotateCw, ExternalLink, Play } from "lucide-react";
 
 export default function ExerciseCard({
   exercise,
