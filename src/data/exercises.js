@@ -4576,5 +4576,380 @@ export const exercises = [
       "bottoms-up",
       "cable-twist"
     ]
+  },
+  {
+    "id": "barbell-bench-press",
+    "name": "Barbell Bench Press",
+    "category": "push",
+    "muscles": ["chest", "pectorals", "triceps", "deltoids"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "dumbbell-bench-press",
+      "incline-barbell-bench-press",
+      "incline-dumbbell-bench-press",
+      "machine-chest-press",
+      "push-up"
+    ]
+  },
+  {
+    "id": "dumbbell-bench-press",
+    "name": "Dumbbell Bench Press",
+    "category": "push",
+    "muscles": ["chest", "pectorals", "triceps", "deltoids"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-bench-press",
+      "incline-barbell-bench-press",
+      "incline-dumbbell-bench-press",
+      "machine-chest-press",
+      "push-up"
+    ]
+  },
+  {
+    "id": "incline-barbell-bench-press",
+    "name": "Incline Barbell Bench Press",
+    "category": "push",
+    "muscles": ["chest", "pectorals", "shoulders", "triceps"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-bench-press",
+      "dumbbell-bench-press",
+      "incline-dumbbell-bench-press",
+      "machine-chest-press"
+    ]
+  },
+  {
+    "id": "incline-dumbbell-bench-press",
+    "name": "Incline Dumbbell Bench Press",
+    "category": "push",
+    "muscles": ["chest", "pectorals", "shoulders", "triceps"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-bench-press",
+      "dumbbell-bench-press",
+      "incline-barbell-bench-press",
+      "machine-chest-press"
+    ]
+  },
+  {
+    "id": "machine-chest-press",
+    "name": "Machine Chest Press",
+    "category": "push",
+    "muscles": ["chest", "pectorals", "triceps"],
+    "equipment": "machine",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-bench-press",
+      "dumbbell-bench-press",
+      "incline-barbell-bench-press",
+      "incline-dumbbell-bench-press"
+    ]
+  },
+  {
+    "id": "barbell-overhead-press",
+    "name": "Barbell Overhead Press",
+    "category": "shoulders",
+    "muscles": ["shoulders", "deltoids", "triceps"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "dumbbell-shoulder-press",
+      "arnold-press",
+      "cable-shoulder-press",
+      "band-shoulder-press"
+    ]
+  },
+  {
+    "id": "dumbbell-shoulder-press",
+    "name": "Dumbbell Shoulder Press",
+    "category": "shoulders",
+    "muscles": ["shoulders", "deltoids", "triceps"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-overhead-press",
+      "arnold-press",
+      "cable-shoulder-press",
+      "band-shoulder-press"
+    ]
+  },
+  {
+    "id": "arnold-press",
+    "name": "Arnold Press",
+    "category": "shoulders",
+    "muscles": ["shoulders", "deltoids", "triceps"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-overhead-press",
+      "dumbbell-shoulder-press",
+      "cable-shoulder-press"
+    ]
+  },
+  {
+    "id": "lateral-raise",
+    "name": "Lateral Raise",
+    "category": "shoulders",
+    "muscles": ["shoulders", "deltoids"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "cable-lateral-raise",
+      "dumbbell-shoulder-press",
+      "barbell-overhead-press"
+    ]
+  },
+  {
+    "id": "cable-lateral-raise",
+    "name": "Cable Lateral Raise",
+    "category": "shoulders",
+    "muscles": ["shoulders", "deltoids"],
+    "equipment": "cable",
+    "gifUrl": null,
+    "alternatives": [
+      "lateral-raise",
+      "dumbbell-shoulder-press",
+      "cable-shoulder-press"
+    ]
+  },
+  {
+    "id": "face-pull",
+    "name": "Face Pull",
+    "category": "shoulders",
+    "muscles": ["shoulders", "rear deltoids", "traps", "back"],
+    "equipment": "cable",
+    "gifUrl": null,
+    "alternatives": [
+      "lateral-raise",
+      "cable-lateral-raise",
+      "shrugs"
+    ]
+  },
+  {
+    "id": "triceps-pushdown",
+    "name": "Triceps Pushdown",
+    "category": "push",
+    "muscles": ["triceps", "forearms"],
+    "equipment": "cable",
+    "gifUrl": null,
+    "alternatives": [
+      "dumbbell-kickback",
+      "triceps-dip",
+      "cable-kickback"
+    ]
+  },
+  {
+    "id": "barbell-deadlift",
+    "name": "Barbell Deadlift",
+    "category": "pull",
+    "muscles": ["back", "hamstrings", "glutes", "lower back", "core"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "romanian-deadlift",
+      "barbell-row",
+      "cable-deadlift"
+    ]
+  },
+  {
+    "id": "romanian-deadlift",
+    "name": "Romanian Deadlift",
+    "category": "legs",
+    "muscles": ["hamstrings", "glutes", "lower back"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-deadlift",
+      "leg-press",
+      "barbell-back-squat"
+    ]
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "Lat Pulldown",
+    "category": "pull",
+    "muscles": ["back", "lats", "biceps"],
+    "equipment": "machine",
+    "gifUrl": null,
+    "alternatives": [
+      "pull-up",
+      "chin-up",
+      "barbell-row",
+      "seated-cable-row"
+    ]
+  },
+  {
+    "id": "pull-up",
+    "name": "Pull-Up",
+    "category": "pull",
+    "muscles": ["back", "lats", "biceps", "core"],
+    "equipment": "bodyweight",
+    "gifUrl": null,
+    "alternatives": [
+      "chin-up",
+      "lat-pulldown",
+      "barbell-row"
+    ]
+  },
+  {
+    "id": "chin-up",
+    "name": "Chin-Up",
+    "category": "pull",
+    "muscles": ["back", "biceps", "lats", "forearms"],
+    "equipment": "bodyweight",
+    "gifUrl": null,
+    "alternatives": [
+      "pull-up",
+      "lat-pulldown",
+      "barbell-row"
+    ]
+  },
+  {
+    "id": "barbell-row",
+    "name": "Barbell Row",
+    "category": "pull",
+    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "dumbbell-row",
+      "seated-cable-row",
+      "lat-pulldown"
+    ]
+  },
+  {
+    "id": "dumbbell-row",
+    "name": "Dumbbell Row",
+    "category": "pull",
+    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-row",
+      "seated-cable-row",
+      "lat-pulldown"
+    ]
+  },
+  {
+    "id": "seated-cable-row",
+    "name": "Seated Cable Row",
+    "category": "pull",
+    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "equipment": "cable",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-row",
+      "dumbbell-row",
+      "lat-pulldown"
+    ]
+  },
+  {
+    "id": "barbell-back-squat",
+    "name": "Barbell Back Squat",
+    "category": "legs",
+    "muscles": ["quads", "quadriceps", "glutes", "hamstrings", "calves"],
+    "equipment": "barbell",
+    "gifUrl": null,
+    "alternatives": [
+      "goblet-squat",
+      "leg-press",
+      "dumbbell-lunge",
+      "romanian-deadlift"
+    ]
+  },
+  {
+    "id": "goblet-squat",
+    "name": "Goblet Squat",
+    "category": "legs",
+    "muscles": ["quads", "quadriceps", "glutes", "core"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-back-squat",
+      "leg-press",
+      "dumbbell-lunge"
+    ]
+  },
+  {
+    "id": "leg-press",
+    "name": "Leg Press",
+    "category": "legs",
+    "muscles": ["quads", "quadriceps", "glutes", "hamstrings"],
+    "equipment": "machine",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-back-squat",
+      "goblet-squat",
+      "dumbbell-lunge"
+    ]
+  },
+  {
+    "id": "dumbbell-lunge",
+    "name": "Dumbbell Lunge",
+    "category": "legs",
+    "muscles": ["quads", "quadriceps", "glutes", "hamstrings"],
+    "equipment": "dumbbell",
+    "gifUrl": null,
+    "alternatives": [
+      "barbell-back-squat",
+      "goblet-squat",
+      "leg-press"
+    ]
+  },
+  {
+    "id": "plank",
+    "name": "Plank",
+    "category": "core",
+    "muscles": ["abs", "core", "lower back"],
+    "equipment": "bodyweight",
+    "gifUrl": null,
+    "alternatives": [
+      "hanging-leg-raise",
+      "russian-twist",
+      "cable-crunch"
+    ]
+  },
+  {
+    "id": "hanging-leg-raise",
+    "name": "Hanging Leg Raise",
+    "category": "core",
+    "muscles": ["abs", "core", "hip flexors"],
+    "equipment": "bodyweight",
+    "gifUrl": null,
+    "alternatives": [
+      "plank",
+      "russian-twist",
+      "cable-crunch"
+    ]
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian Twist",
+    "category": "core",
+    "muscles": ["obliques", "abs", "core"],
+    "equipment": "bodyweight",
+    "gifUrl": null,
+    "alternatives": [
+      "plank",
+      "hanging-leg-raise",
+      "cable-crunch"
+    ]
+  },
+  {
+    "id": "cable-crunch",
+    "name": "Cable Crunch",
+    "category": "core",
+    "muscles": ["abs", "core"],
+    "equipment": "cable",
+    "gifUrl": null,
+    "alternatives": [
+      "plank",
+      "hanging-leg-raise",
+      "russian-twist"
+    ]
   }
 ];

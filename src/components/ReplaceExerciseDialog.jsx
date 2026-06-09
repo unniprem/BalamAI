@@ -65,7 +65,7 @@ export default function ReplaceExerciseDialog({
       
       return true;
     });
-  }, [category, currentId, searchQuery, selectedEquipment, allowedEquipment]);
+  }, [focus, currentId, searchQuery, selectedEquipment, allowedEquipment]);
 
   if (!currentExercise) return null;
 
