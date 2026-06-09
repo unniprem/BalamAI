@@ -121,14 +121,23 @@ export function getWeeklySplitLayout(split, days) {
  * Generates a list of randomized exercises for a target focus category set.
  * @param {string[]} focusCategories - e.g. ["push", "shoulders"]
  * @param {number} count - number of exercises needed (e.g. 4, 5, 6)
+ * @param {string[]} [allowedEquipment=[]] - allowed equipment list
  * @returns {Object[]} Generated exercises list
  */
-export function generateExercisesForFocus(focusCategories, count) {
+export function generateExercisesForFocus(focusCategories, count, allowedEquipment = []) {
   // If rest day or empty focus
   if (!focusCategories || focusCategories.length === 0) return [];
 
   // Filter the exercises matching any of the focus categories
-  const pool = exercises.filter(ex => focusCategories.includes(ex.category));
+  let pool = exercises.filter(ex => focusCategories.includes(ex.category));
+  
+  // Apply equipment filtering if settings are present
+  if (allowedEquipment && allowedEquipment.length > 0) {
+    const filtered = pool.filter(ex => allowedEquipment.includes(ex.equipment));
+    if (filtered.length > 0) {
+      pool = filtered;
+    }
+  }
   
   if (pool.length === 0) return [];
 

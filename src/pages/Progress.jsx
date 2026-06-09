@@ -1,15 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { loadWorkouts, loadSettings } from "../lib/storage";
 import { TrendingUp, Flame, Dumbbell, BarChart3, PieChart, Info } from "lucide-react";
 
 export default function Progress() {
-  const [workouts, setWorkouts] = useState([]);
-  const [settings, setSettings] = useState(() => loadSettings());
-
-  useEffect(() => {
-    setWorkouts(loadWorkouts());
-    setSettings(loadSettings());
-  }, []);
+  const [workouts] = useState(() => loadWorkouts());
+  const [settings] = useState(() => loadSettings());
 
   // Compute metrics
   const totalWorkouts = workouts.length;
