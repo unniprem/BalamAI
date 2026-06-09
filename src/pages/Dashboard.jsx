@@ -66,6 +66,10 @@ export default function Dashboard() {
   const [customDayFocuses, setCustomDayFocuses] = useState([]);
   const [isCustomDayRest, setIsCustomDayRest] = useState(false);
 
+  // Computed Values
+  const activeDay = weeklySchedule.find((d) => d.id === activeDayId) || null;
+  const isRestDay = activeDay?.rest || false;
+
   // Sync customization state when active day changes
   useEffect(() => {
     const currentActiveDay = weeklySchedule.find((d) => d.id === activeDayId);
@@ -224,8 +228,6 @@ export default function Dashboard() {
   }, [regenerateWholeSchedule]);
 
   // --- Workout Actions ---
-  const activeDay = weeklySchedule.find((d) => d.id === activeDayId) || null;
-  const isRestDay = activeDay?.rest || false;
 
   const handleToggleComplete = useCallback((exerciseId) => {
     // Automatically trigger timer start when checking the first exercise
