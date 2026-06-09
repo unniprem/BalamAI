@@ -61,6 +61,88 @@ export default function Dashboard() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastCompletedWorkout, setLastCompletedWorkout] = useState(null);
 
+  // Day Customization State
+  const [showDayCustomize, setShowDayCustomize] = useState(false);
+  const [customDayFocuses, setCustomDayFocuses] = useState([]);
+  const [isCustomDayRest, setIsCustomDayRest] = useState(false);
+
+  // Sync customization state when active day changes
+  useEffect(() => {
+    const currentActiveDay = weeklySchedule.find((d) => d.id === activeDayId);
+    if (currentActiveDay) {
+      setCustomDayFocuses(currentActiveDay.focus || []);
+      setIsCustomDayRest(currentActiveDay.rest || false);
+      setShowDayCustomize(false);
+    }
+  }, [activeDayId, weeklySchedule]);
+
+  const handleSaveDayCustomization = useCallback(() => {
+    if (!activeDay) return;
+
+    setWeeklySchedule((prevSchedule) => {
+      const updated = prevSchedule.map((day) => {
+        if (day.id === activeDayId) {
+          const rest = isCustomDayRest;
+          const focus = rest ? [] : customDayFocuses;
+          const exercises = rest
+            ? []
+            : generateExercisesForFocus(focus, settings.exerciseCount, settings.equipment);
+
+          return {
+            ...day,
+            rest,
+            focus,
+            exercises,
+          };
+        }
+        return day;
+      });
+
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
+    });
+
+    setShowDayCustomize(false);
+    
+    // Reset timer
+    setWorkoutActive(false);
+    setSecondsElapsed(0);
+  }, [activeDay, activeDayId, customDayFocuses, isCustomDayRest, settings.exerciseCount, settings.equipment]);
+
+  const handleSwapDays = useCallback((targetDayId) => {
+    setWeeklySchedule((prevSchedule) => {
+      const day1Index = prevSchedule.findIndex((d) => d.id === activeDayId);
+      const day2Index = prevSchedule.findIndex((d) => d.id === targetDayId);
+      if (day1Index === -1 || day2Index === -1) return prevSchedule;
+
+      const updated = [...prevSchedule];
+      const tempFocus = updated[day1Index].focus;
+      const tempRest = updated[day1Index].rest;
+      const tempExercises = updated[day1Index].exercises;
+
+      updated[day1Index] = {
+        ...updated[day1Index],
+        focus: updated[day2Index].focus,
+        rest: updated[day2Index].rest,
+        exercises: updated[day2Index].exercises,
+      };
+
+      updated[day2Index] = {
+        ...updated[day2Index],
+        focus: tempFocus,
+        rest: tempRest,
+        exercises: tempExercises,
+      };
+
+      localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+      return updated;
+    });
+
+    // Reset timer
+    setWorkoutActive(false);
+    setSecondsElapsed(0);
+  }, [activeDayId]);
+
   // Handle active workout state timer
   useEffect(() => {
     if (workoutActive) {
@@ -479,6 +561,104 @@ export default function Dashboard() {
                 {isRestDay ? "Rest & Recovery" : activeDay?.focus?.map(f => f.toUpperCase()).join(" + ")}
               </h2>
             </div>
+
+            {/* Customize / Swap Buttons */}
+            <div className="flex gap-2 border-t border-zinc-900 pt-3">
+              <button
+                onClick={() => setShowDayCustomize(!showDayCustomize)}
+                className="flex-1 text-center rounded-xl bg-zinc-900 border border-zinc-805 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-850 transition-all duration-300"
+              >
+                {showDayCustomize ? "Cancel Edit" : "Configure Day"}
+              </button>
+              
+              {/* Swap Dropdown */}
+              <div className="relative flex-1">
+                <select
+                  value=""
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      handleSwapDays(e.target.value);
+                      e.target.value = ""; // reset dropdown
+                    }
+                  }}
+                  className="w-full text-center rounded-xl bg-zinc-900 border border-zinc-805 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-850 transition-all duration-300 appearance-none cursor-pointer outline-none"
+                >
+                  <option value="" disabled>Swap Day...</option>
+                  {weeklySchedule
+                    .filter((d) => d.id !== activeDayId)
+                    .map((d) => (
+                      <option key={d.id} value={d.id}>
+                        Swap with {d.id.replace("-", " ").toUpperCase()}
+                      </option>
+                    ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-zinc-500">
+                  <span className="text-[10px]">▼</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Customization Panel */}
+            {showDayCustomize && (
+              <div className="rounded-xl border border-zinc-850 bg-zinc-900/40 p-4 space-y-4 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">Configure Focus</span>
+                  
+                  {/* Rest Day Switcher */}
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomDayRest(!isCustomDayRest)}
+                    className={`rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${
+                      isCustomDayRest
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                        : "bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white"
+                    }`}
+                  >
+                    {isCustomDayRest ? "Rest Day" : "Set Rest"}
+                  </button>
+                </div>
+
+                {!isCustomDayRest && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Select Muscle Groups / Categories</span>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {["chest", "back", "shoulders", "arms", "legs", "core", "push", "pull"].map((focusOption) => {
+                        const isSelected = customDayFocuses.includes(focusOption);
+                        return (
+                          <button
+                            key={focusOption}
+                            type="button"
+                            onClick={() => {
+                              if (isSelected) {
+                                setCustomDayFocuses(customDayFocuses.filter((f) => f !== focusOption));
+                              } else {
+                                setCustomDayFocuses([...customDayFocuses, focusOption]);
+                              }
+                            }}
+                            className={`rounded-lg py-1.5 text-xs font-semibold capitalize border transition-all duration-200 ${
+                              isSelected
+                                ? "bg-emerald-500/10 text-emerald-450 border-emerald-500/30"
+                                : "bg-zinc-950/40 text-zinc-400 border-zinc-850 hover:bg-zinc-900/60"
+                            }`}
+                          >
+                            {focusOption}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleSaveDayCustomization}
+                  disabled={!isCustomDayRest && customDayFocuses.length === 0}
+                  className="w-full rounded-xl bg-emerald-500 py-2 text-xs font-extrabold text-black hover:bg-emerald-400 transition-all duration-300 disabled:opacity-50"
+                >
+                  Save & Regenerate
+                </button>
+              </div>
+            )}
 
             {/* Display Stats or Details */}
             {isRestDay ? (
