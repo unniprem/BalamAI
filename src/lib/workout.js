@@ -1,191 +1,211 @@
-import { CATEGORIES, EXERCISES, getExerciseById } from "@/data/exercises";
-import { getMode } from "@/data/modes";
-import { recommendForExercise } from "@/lib/overload";
+import { exercises } from "../data/exercises";
 
-export function newId(prefix = "id") {
-  return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
+/**
+ * Returns the layout of focuses for each day of the week based on days count and split type.
+ * @param {string} split - "bro", "push-pull", "other"
+ * @param {number} days - 3, 4, 5, or 6
+ * @returns {Array<{name: string, focus: string[], rest: boolean}>}
+ */
+export function getWeeklySplitLayout(split, days) {
+  const layout = [];
 
-function pickRandom(list) {
-  return list[Math.floor(Math.random() * list.length)];
-}
-
-export function generateWorkout(previousWorkout, modeId, history = []) {
-  const mode = getMode(modeId);
-  const previousIds = new Set(
-    (previousWorkout?.exercises || []).map((e) => e.exerciseId),
-  );
-
-  const picked = CATEGORIES.map((category) => {
-    const pool = EXERCISES.filter((e) => e.category === category);
-    const fresh = pool.filter((e) => !previousIds.has(e.id));
-    const chosen = pickRandom(fresh.length > 0 ? fresh : pool);
-    return buildEntry(chosen, mode, history);
-  });
-
-  return {
-    id: newId("wo"),
-    createdAt: new Date().toISOString(),
-    startedAt: null,
-    completedAt: null,
-    mode: mode.id,
-    exercises: picked,
-  };
-}
-
-// Build a fresh exercise entry with prescription, recommended pre-fill values,
-// and an optional `recommendation` snapshot.
-function buildEntry(exerciseDef, mode, history) {
-  const rec = recommendForExercise(history, exerciseDef.id, mode.id, exerciseDef.increment);
-
-  const entry = {
-    id: newId("ex"),
-    exerciseId: exerciseDef.id,
-    prescription: {
-      repsMin: mode.repsMin,
-      repsMax: mode.repsMax,
-      restMin: mode.restMin,
-      restMax: mode.restMax,
-    },
-    sets: Array.from({ length: mode.sets }, () => ({
-      id: newId("set"),
-      weight: rec.weight,
-      reps: rec.reps,
-      completed: false,
-    })),
-  };
-
-  if (rec.source !== "first-time") {
-    entry.recommendation = {
-      source: rec.source,
-      fromWeight: rec.fromWeight,
-      fromReps: rec.fromReps,
-    };
-  }
-
-  return entry;
-}
-
-export function startWorkout(workout) {
-  return { ...workout, startedAt: workout.startedAt || new Date().toISOString() };
-}
-
-export function replaceExercise(workout, exerciseEntryId, newExerciseId, history = []) {
-  const mode = getMode(workout.mode);
-  const newDef = getExerciseById(newExerciseId);
-  return {
-    ...workout,
-    exercises: workout.exercises.map((entry) => {
-      if (entry.id !== exerciseEntryId) return entry;
-      const rec = recommendForExercise(history, newDef.id, mode.id, newDef.increment);
-      const next = {
-        ...entry,
-        exerciseId: newExerciseId,
-        sets: entry.sets.map((s) => ({
-          ...s,
-          weight: rec.weight,
-          reps: rec.reps,
-          completed: false,
-        })),
-      };
-      if (rec.source !== "first-time") {
-        next.recommendation = {
-          source: rec.source,
-          fromWeight: rec.fromWeight,
-          fromReps: rec.fromReps,
-        };
-      } else {
-        delete next.recommendation;
-      }
-      return next;
-    }),
-  };
-}
-
-export function addSet(workout, exerciseEntryId) {
-  return {
-    ...workout,
-    exercises: workout.exercises.map((entry) => {
-      if (entry.id !== exerciseEntryId) return entry;
-      const last = entry.sets[entry.sets.length - 1];
-      return {
-        ...entry,
-        sets: [
-          ...entry.sets,
-          {
-            id: newId("set"),
-            weight: last?.weight ?? 0,
-            reps: last?.reps ?? 0,
-            completed: false,
-          },
-        ],
-      };
-    }),
-  };
-}
-
-export function removeSet(workout, exerciseEntryId, setId) {
-  return {
-    ...workout,
-    exercises: workout.exercises.map((entry) =>
-      entry.id === exerciseEntryId
-        ? { ...entry, sets: entry.sets.filter((s) => s.id !== setId) }
-        : entry,
-    ),
-  };
-}
-
-export function updateSet(workout, exerciseEntryId, setId, patch) {
-  return {
-    ...workout,
-    exercises: workout.exercises.map((entry) =>
-      entry.id === exerciseEntryId
-        ? {
-            ...entry,
-            sets: entry.sets.map((s) => (s.id === setId ? { ...s, ...patch } : s)),
-          }
-        : entry,
-    ),
-  };
-}
-
-export function computeWorkoutVolume(workout) {
-  let total = 0;
-  for (const entry of workout.exercises || []) {
-    for (const set of entry.sets || []) {
-      if (!set.completed) continue;
-      const w = Number(set.weight) || 0;
-      const r = Number(set.reps) || 0;
-      total += w * r;
+  // Helper to construct days
+  if (split === "bro") {
+    if (days === 3) {
+      layout.push({ name: "Day 1", focus: ["push", "shoulders"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs", "core"], rest: false });
+    } else if (days === 4) {
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["shoulders", "core"], rest: false });
+    } else if (days === 5) {
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["shoulders"], rest: false });
+      layout.push({ name: "Day 5", focus: ["core"], rest: false });
+    } else { // 6 days
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["shoulders"], rest: false });
+      layout.push({ name: "Day 5", focus: ["pull"], rest: false }); // repeat pull
+      layout.push({ name: "Day 6", focus: ["core"], rest: false });
+    }
+  } else if (split === "push-pull") {
+    if (days === 3) {
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs", "core"], rest: false });
+    } else if (days === 4) {
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["core"], rest: false });
+    } else if (days === 5) {
+      layout.push({ name: "Day 1", focus: ["push", "shoulders"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["push"], rest: false });
+      layout.push({ name: "Day 5", focus: ["pull", "core"], rest: false });
+    } else { // 6 days
+      layout.push({ name: "Day 1", focus: ["push"], rest: false });
+      layout.push({ name: "Day 2", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 3", focus: ["legs"], rest: false });
+      layout.push({ name: "Day 4", focus: ["push"], rest: false });
+      layout.push({ name: "Day 5", focus: ["pull"], rest: false });
+      layout.push({ name: "Day 6", focus: ["legs", "core"], rest: false });
+    }
+  } else { // "other" (Upper / Lower / Full Body)
+    if (days === 3) {
+      layout.push({ name: "Day 1", focus: ["push", "pull", "legs", "shoulders", "core"], rest: false }); // Full Body
+      layout.push({ name: "Day 2", focus: ["push", "pull", "legs", "shoulders", "core"], rest: false }); // Full Body
+      layout.push({ name: "Day 3", focus: ["push", "pull", "legs", "shoulders", "core"], rest: false }); // Full Body
+    } else if (days === 4) {
+      layout.push({ name: "Day 1", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 2", focus: ["legs", "core"], rest: false });            // Lower
+      layout.push({ name: "Day 3", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 4", focus: ["legs", "core"], rest: false });            // Lower
+    } else if (days === 5) {
+      layout.push({ name: "Day 1", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 2", focus: ["legs", "core"], rest: false });            // Lower
+      layout.push({ name: "Day 3", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 4", focus: ["legs", "core"], rest: false });            // Lower
+      layout.push({ name: "Day 5", focus: ["push", "pull", "legs", "shoulders", "core"], rest: false }); // Full Body
+    } else { // 6 days
+      layout.push({ name: "Day 1", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 2", focus: ["legs", "core"], rest: false });            // Lower
+      layout.push({ name: "Day 3", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 4", focus: ["legs", "core"], rest: false });            // Lower
+      layout.push({ name: "Day 5", focus: ["push", "pull", "shoulders"], rest: false }); // Upper
+      layout.push({ name: "Day 6", focus: ["legs", "core"], rest: false });            // Lower
     }
   }
-  return total;
+
+  // Pad to 7 calendar days to show Rest Days
+  const activeCount = layout.length;
+  const restCount = 7 - activeCount;
+
+  // Distribute rest days evenly
+  if (restCount === 1) {
+    // Add rest day at the end
+    layout.push({ name: "Rest Day", focus: [], rest: true });
+  } else if (restCount === 2) {
+    // Rest days mid-week and end-week
+    layout.splice(3, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.push({ name: "Rest Day", focus: [], rest: true });
+  } else if (restCount === 3) {
+    // Rest days after every 2 active days
+    layout.splice(2, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.splice(5, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.push({ name: "Rest Day", focus: [], rest: true });
+  } else if (restCount === 4) {
+    // 3 active days means 4 rest days
+    layout.splice(1, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.splice(3, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.splice(5, 0, { name: "Rest Day", focus: [], rest: true });
+    layout.push({ name: "Rest Day", focus: [], rest: true });
+  }
+
+  // Standardize the day index name
+  return layout.map((day, idx) => ({
+    ...day,
+    id: `day-${idx + 1}`,
+    name: day.rest ? "Rest Day" : `Workout Day ${layout.filter((d, i) => i < idx && !d.rest).length + 1}`
+  }));
 }
 
-export function formatDuration(ms) {
-  if (!ms || ms < 0) return "0m";
-  const totalSeconds = Math.floor(ms / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
+/**
+ * Generates a list of randomized exercises for a target focus category set.
+ * @param {string[]} focusCategories - e.g. ["push", "shoulders"]
+ * @param {number} count - number of exercises needed (e.g. 4, 5, 6)
+ * @returns {Object[]} Generated exercises list
+ */
+export function generateExercisesForFocus(focusCategories, count) {
+  // If rest day or empty focus
+  if (!focusCategories || focusCategories.length === 0) return [];
+
+  // Filter the exercises matching any of the focus categories
+  const pool = exercises.filter(ex => focusCategories.includes(ex.category));
+  
+  if (pool.length === 0) return [];
+
+  // Shuffle pool
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+
+  // We want to make sure we select at least one exercise from each focus category if multiple categories are specified
+  const result = [];
+  const selectedIds = new Set();
+
+  if (focusCategories.length > 1) {
+    // Try to pick one from each category first
+    focusCategories.forEach(cat => {
+      const match = shuffled.find(ex => ex.category === cat && !selectedIds.has(ex.id));
+      if (match) {
+        result.push({ ...match, completed: false });
+        selectedIds.add(match.id);
+      }
+    });
+  }
+
+  // Fill up the rest of the exercises randomly
+  for (const ex of shuffled) {
+    if (result.length >= count) break;
+    if (!selectedIds.has(ex.id)) {
+      result.push({ ...ex, completed: false });
+      selectedIds.add(ex.id);
+    }
+  }
+
+  // If still not enough, we can repeat from the pool with fresh instance IDs
+  let index = 0;
+  while (result.length < count) {
+    const item = shuffled[index % shuffled.length];
+    result.push({
+      ...item,
+      id: `${item.id}-dup-${Date.now()}-${result.length}`,
+      completed: false
+    });
+    index++;
+  }
+
+  return result;
 }
 
-export function finishWorkout(workout) {
-  const start = workout.startedAt ? new Date(workout.startedAt) : new Date();
-  const end = new Date();
-  const duration = end.getTime() - start.getTime();
-  const totalVolume = computeWorkoutVolume(workout);
-  return {
-    ...workout,
-    completedAt: end.toISOString(),
-    duration,
-    totalVolume,
-  };
+/**
+ * Returns a human-readable name for a goal.
+ * @param {string} goal
+ * @returns {string}
+ */
+export function getGoalLabel(goal) {
+  switch (goal) {
+    case "lose-fat":
+      return "Lose Fat / Cardio";
+    case "strength":
+      return "Weight Strengthening / Power";
+    case "general":
+      return "General Fitness / Tone";
+    default:
+      return "Fitness Goal";
+  }
 }
 
-export function workoutSummary(workout) {
-  return workout.exercises
-    .map((entry) => getExerciseById(entry.exerciseId)?.name)
-    .filter(Boolean);
+/**
+ * Returns a human-readable name for a split.
+ * @param {string} split
+ * @returns {string}
+ */
+export function getSplitLabel(split) {
+  switch (split) {
+    case "bro":
+      return "Bro Split (Single Muscle Groups)";
+    case "push-pull":
+      return "Push-Pull-Legs (PPL)";
+    case "other":
+      return "Full Body / Upper-Lower";
+    default:
+      return "Workout Split";
+  }
 }

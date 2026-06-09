@@ -1,189 +1,587 @@
-import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Calendar, Dumbbell, Flame, Play, RotateCcw, Trophy } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { RecoveryPanel } from "@/components/RecoveryPanel";
-import { StatsCard } from "@/components/StatsCard";
-import { WorkoutCard } from "@/components/WorkoutCard";
-import { useCurrentWorkout } from "@/hooks/useCurrentWorkout";
-import { useWorkoutHistory } from "@/hooks/useWorkoutHistory";
-import { generateWorkout } from "@/lib/workout";
-import { computeStreak, formatRelativeDate, lastWorkoutDate } from "@/lib/stats";
-import { MODE_ORDER, MODES } from "@/data/modes";
-import { loadSettings, saveSettings } from "@/lib/storage";
-import { cn } from "@/lib/utils";
+import React, { useState, useEffect, useRef } from "react";
+import { exercises } from "../data/exercises";
+import {
+  loadSettings,
+  saveSettings,
+  saveWorkout,
+  loadWorkouts,
+} from "../lib/storage";
+import {
+  getWeeklySplitLayout,
+  generateExercisesForFocus,
+  getGoalLabel,
+  getSplitLabel,
+} from "../lib/workout";
+import ExerciseCard from "../components/ExerciseCard";
+import ReplaceExerciseDialog from "../components/ReplaceExerciseDialog";
+import {
+  Settings,
+  Calendar,
+  Flame,
+  RotateCw,
+  Trophy,
+  Activity,
+  Play,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+} from "lucide-react";
 
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const { workout, setWorkout } = useCurrentWorkout();
-  const { workouts } = useWorkoutHistory();
+  // --- State ---
+  const [settings, setSettings] = useState(() => loadSettings());
+  const [weeklySchedule, setWeeklySchedule] = useState([]);
+  const [activeDayId, setActiveDayId] = useState("day-1");
+  const [showSettings, setShowSettings] = useState(false);
+  const [swapTarget, setSwapTarget] = useState(null); // exercise to swap
+  
+  // Timer State
+  const [workoutActive, setWorkoutActive] = useState(false);
+  const [secondsElapsed, setSecondsElapsed] = useState(0);
+  const timerRef = useRef(null);
 
-  const [mode, setMode] = useState(() => loadSettings().mode);
+  // Success Modal State
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastCompletedWorkout, setLastCompletedWorkout] = useState(null);
 
-  function handleSelectMode(nextMode) {
-    setMode(nextMode);
-    saveSettings({ mode: nextMode });
-  }
+  // --- Initial Layout and Loading ---
+  useEffect(() => {
+    // Check if we already have a generated schedule in LocalStorage
+    const storedSchedule = localStorage.getItem("balamai_weekly_schedule");
+    const storedSettingsString = localStorage.getItem("balamai_stored_settings_key");
+    
+    const settingsStr = JSON.stringify(settings);
+    
+    if (storedSchedule && storedSettingsString === settingsStr) {
+      setWeeklySchedule(JSON.parse(storedSchedule));
+    } else {
+      // Regenerate schedule
+      regenerateWholeSchedule(settings);
+    }
+  }, [settings]);
 
-  const stats = useMemo(() => {
-    const last = lastWorkoutDate(workouts);
-    return {
-      total: workouts.length,
-      streak: computeStreak(workouts),
-      last,
+  // Handle active workout state timer
+  useEffect(() => {
+    if (workoutActive) {
+      timerRef.current = setInterval(() => {
+        setSecondsElapsed((prev) => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [workouts]);
+  }, [workoutActive]);
 
-  function handleGenerate() {
-    const previous = workouts[0] || workout;
-    const fresh = generateWorkout(previous, mode, workouts);
-    setWorkout(fresh);
-    navigate("/workout");
-  }
+  // Format active timer string
+  const formatTime = (secs) => {
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = secs % 60;
+    return `${mins}:${remainingSecs < 10 ? "0" : ""}${remainingSecs}`;
+  };
 
-  function handleStart() {
-    if (!workout) handleGenerate();
-    else navigate("/workout");
-  }
+  // --- Schedule Generation ---
+  const regenerateWholeSchedule = (currentSettings) => {
+    const layout = getWeeklySplitLayout(currentSettings.split, currentSettings.days);
+    
+    // For each active day, generate a list of exercises
+    const fullSchedule = layout.map((day) => {
+      if (day.rest) {
+        return { ...day, exercises: [] };
+      }
+      return {
+        ...day,
+        exercises: generateExercisesForFocus(day.focus, currentSettings.exerciseCount),
+      };
+    });
+
+    setWeeklySchedule(fullSchedule);
+    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(fullSchedule));
+    localStorage.setItem("balamai_stored_settings_key", JSON.stringify(currentSettings));
+
+    // Find first active day and select it
+    const firstActive = fullSchedule.find((d) => !d.rest);
+    if (firstActive) {
+      setActiveDayId(firstActive.id);
+    }
+  };
+
+  const regenerateSpecificDay = (dayId) => {
+    const updated = weeklySchedule.map((day) => {
+      if (day.id === dayId) {
+        return {
+          ...day,
+          exercises: generateExercisesForFocus(day.focus, settings.exerciseCount),
+        };
+      }
+      return day;
+    });
+    setWeeklySchedule(updated);
+    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+  };
+
+  // --- Setting Change Handlers ---
+  const handleSettingChange = (key, value) => {
+    const updatedSettings = { ...settings, [key]: value };
+    setSettings(updatedSettings);
+    saveSettings(updatedSettings);
+    
+    // Reset timer
+    setWorkoutActive(false);
+    setSecondsElapsed(0);
+  };
+
+  // --- Workout Actions ---
+  const activeDay = weeklySchedule.find((d) => d.id === activeDayId) || null;
+  const isRestDay = activeDay?.rest || false;
+
+  const handleToggleComplete = (exerciseId) => {
+    // Automatically trigger timer start when checking the first exercise
+    if (!workoutActive && secondsElapsed === 0) {
+      setWorkoutActive(true);
+    }
+
+    const updated = weeklySchedule.map((day) => {
+      if (day.id === activeDayId) {
+        return {
+          ...day,
+          exercises: day.exercises.map((ex) =>
+            ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
+          ),
+        };
+      }
+      return day;
+    });
+
+    setWeeklySchedule(updated);
+    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+  };
+
+  const handleSwapExercise = (newExerciseId) => {
+    const newExTemplate = exercises.find((ex) => ex.id === newExerciseId);
+    if (!newExTemplate) return;
+
+    const updated = weeklySchedule.map((day) => {
+      if (day.id === activeDayId) {
+        return {
+          ...day,
+          exercises: day.exercises.map((ex) =>
+            ex.id === swapTarget.id
+              ? {
+                  ...newExTemplate,
+                  // Preserve key elements but swap templates
+                  id: `${newExTemplate.id}-${Date.now()}`,
+                  completed: false,
+                }
+              : ex
+          ),
+        };
+      }
+      return day;
+    });
+
+    setWeeklySchedule(updated);
+    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+    setSwapTarget(null);
+  };
+
+  const handleFinishWorkout = () => {
+    if (!activeDay || isRestDay) return;
+    
+    const completed = activeDay.exercises.filter((ex) => ex.completed);
+    if (completed.length === 0) {
+      alert("Please complete at least one exercise before finishing the workout!");
+      return;
+    }
+
+    // Stop timer
+    setWorkoutActive(false);
+
+    const durationStr = formatTime(secondsElapsed);
+
+    const workoutLog = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split("T")[0],
+      dayName: activeDay.name,
+      focusNames: activeDay.focus.map((f) => f.toUpperCase()),
+      exercises: activeDay.exercises.map((ex) => ({
+        id: ex.id,
+        name: ex.name,
+        category: ex.category,
+        equipment: ex.equipment,
+        completed: ex.completed,
+      })),
+      completedCount: completed.length,
+      totalCount: activeDay.exercises.length,
+      duration: durationStr,
+      split: getSplitLabel(settings.split),
+      goal: getGoalLabel(settings.goal),
+    };
+
+    saveWorkout(workoutLog);
+    setLastCompletedWorkout(workoutLog);
+    setShowSuccessModal(true);
+
+    // Reset day's exercise checkmarks
+    const updated = weeklySchedule.map((day) => {
+      if (day.id === activeDayId) {
+        return {
+          ...day,
+          exercises: day.exercises.map((ex) => ({ ...ex, completed: false })),
+        };
+      }
+      return day;
+    });
+    setWeeklySchedule(updated);
+    localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
+    
+    // Reset timer state
+    setSecondsElapsed(0);
+    
+    // Update settings in state to reflect new streak
+    setSettings(loadSettings());
+  };
+
+  // Calculate completion percentage
+  const activeCompletedCount = activeDay?.exercises?.filter((e) => e.completed)?.length || 0;
+  const activeTotalCount = activeDay?.exercises?.length || 0;
+  const completionPercentage = activeTotalCount
+    ? Math.round((activeCompletedCount / activeTotalCount) * 100)
+    : 0;
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-1">
-        <p className="text-sm text-muted-foreground">Welcome back</p>
-        <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-          Ready to train?
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          BalamAI adapts your workout to whatever your gym has today.
-        </p>
-      </header>
+    <div className="space-y-6">
+      {/* Upper header segment: Welcome details */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            My Workout Plan
+          </h1>
+          <p className="mt-1.5 text-zinc-400 text-sm">
+            Configure your week, customize exercises, and track your training offline.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <StatsCard
-          icon={Trophy}
-          label="Total workouts"
-          value={stats.total}
-          hint="Completed sessions"
-        />
-        <StatsCard
-          icon={Flame}
-          label="Current streak"
-          value={stats.streak}
-          hint={stats.streak === 1 ? "day" : "days"}
-        />
-        <StatsCard
-          icon={Calendar}
-          label="Last workout"
-          value={formatRelativeDate(stats.last)}
-          hint={stats.last ? new Date(stats.last).toLocaleDateString() : "No history yet"}
-        />
+        {/* Buttons: Quick settings toggler */}
+        <button
+          onClick={() => setShowSettings(!showSettings)}
+          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
+            showSettings
+              ? "bg-emerald-500 text-black shadow-md shadow-emerald-500/20"
+              : "bg-zinc-900 text-zinc-350 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <Settings className={`h-4.5 w-4.5 ${showSettings ? "animate-spin-once" : ""}`} />
+          Configure Routine
+        </button>
       </div>
 
-      <RecoveryPanel history={workouts} />
+      {/* Configuration Section (Dropdown panel) */}
+      {showSettings && (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-xl animate-in fade-in-50 slide-in-from-top-4 duration-300">
+          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            <Settings className="h-5 w-5 text-emerald-400" />
+            Customize Settings
+          </h2>
+          
+          <div className="grid gap-6 md:grid-cols-4">
+            {/* Goal Selector */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Fitness Goal
+              </label>
+              <select
+                value={settings.goal}
+                onChange={(e) => handleSettingChange("goal", e.target.value)}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="lose-fat">Lose Fat / Cardio</option>
+                <option value="strength">Weight Strengthening / Power</option>
+                <option value="general">General Fitness / Tone</option>
+              </select>
+            </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Training mode
-          </span>
-          <span className="text-[11px] text-muted-foreground">
-            {MODES[mode].sets} sets · {MODES[mode].repsMin}-{MODES[mode].repsMax} reps
-          </span>
+            {/* Split Selector */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Split Type
+              </label>
+              <select
+                value={settings.split}
+                onChange={(e) => handleSettingChange("split", e.target.value)}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="bro">Bro Split (Target Single Focus)</option>
+                <option value="push-pull">Push-Pull-Legs (PPL)</option>
+                <option value="other">Full Body / Upper-Lower</option>
+              </select>
+            </div>
+
+            {/* Days per week */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Active Days
+              </label>
+              <select
+                value={settings.days}
+                onChange={(e) => handleSettingChange("days", parseInt(e.target.value))}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="3">3 Days / Week</option>
+                <option value="4">4 Days / Week</option>
+                <option value="5">5 Days / Week</option>
+                <option value="6">6 Days / Week</option>
+              </select>
+            </div>
+
+            {/* Exercises per day */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                Exercises / Day
+              </label>
+              <select
+                value={settings.exerciseCount}
+                onChange={(e) => handleSettingChange("exerciseCount", parseInt(e.target.value))}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              >
+                <option value="4">4 Exercises</option>
+                <option value="5">5 Exercises</option>
+                <option value="6">6 Exercises</option>
+                <option value="7">7 Exercises</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-5 border-t border-zinc-900 flex justify-between items-center flex-wrap gap-3">
+            <span className="text-xs text-zinc-400">
+              Active configuration: <strong className="text-white">{getGoalLabel(settings.goal)}</strong> with <strong className="text-white">{getSplitLabel(settings.split)}</strong> structure.
+            </span>
+            <button
+              onClick={() => regenerateWholeSchedule(settings)}
+              className="flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 px-4.5 py-2 text-xs font-semibold text-white hover:bg-zinc-850 transition-all duration-355 active:scale-95"
+            >
+              <RotateCw className="h-3.5 w-3.5" />
+              Regenerate Full Week
+            </button>
+          </div>
         </div>
-        <div
-          role="radiogroup"
-          aria-label="Training mode"
-          className="flex rounded-lg border border-border/70 bg-muted/30 p-1"
-          onKeyDown={(e) => {
-            const idx = MODE_ORDER.indexOf(mode);
-            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-              e.preventDefault();
-              handleSelectMode(MODE_ORDER[(idx + 1) % MODE_ORDER.length]);
-            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-              e.preventDefault();
-              handleSelectMode(
-                MODE_ORDER[(idx - 1 + MODE_ORDER.length) % MODE_ORDER.length],
-              );
-            }
-          }}
-        >
-          {MODE_ORDER.map((id) => {
-            const selected = id === mode;
+      )}
+
+      {/* Timeline of the Week (7 Calendar Days layout) */}
+      <div className="rounded-2xl border border-zinc-850 bg-zinc-950 p-4 shadow-xl overflow-hidden">
+        <div className="flex items-center gap-2 mb-3.5 px-1">
+          <Calendar className="h-4.5 w-4.5 text-emerald-450" />
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Weekly Schedule</h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-7">
+          {weeklySchedule.map((day) => {
+            const isActive = day.id === activeDayId;
+            const isDayRest = day.rest;
+
             return (
               <button
-                key={id}
-                type="button"
-                role="radio"
-                aria-checked={selected}
-                tabIndex={selected ? 0 : -1}
-                onClick={() => handleSelectMode(id)}
-                className={cn(
-                  "flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                  selected
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
+                key={day.id}
+                onClick={() => setActiveDayId(day.id)}
+                className={`flex flex-col items-center p-3.5 rounded-xl text-center transition-all duration-300 border relative ${
+                  isActive
+                    ? "bg-emerald-500/10 border-emerald-500 text-white scale-[1.02] shadow-md shadow-emerald-500/5"
+                    : isDayRest
+                    ? "bg-zinc-900/15 border-zinc-850/60 text-zinc-500 hover:bg-zinc-900/30"
+                    : "bg-zinc-900/40 border-zinc-800/80 text-zinc-300 hover:border-zinc-700/80 hover:bg-zinc-900/60"
+                }`}
               >
-                {MODES[id].label}
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                  {day.id.replace("-", " ")}
+                </span>
+                
+                <span className={`mt-2.5 text-xs font-bold leading-none ${isActive ? "text-emerald-400" : isDayRest ? "text-zinc-650" : "text-zinc-250"}`}>
+                  {isDayRest ? "REST" : day.focus.map(f => f.slice(0, 4).toUpperCase()).join("/")}
+                </span>
+
+                {day.exercises.length > 0 && (
+                  <span className="absolute bottom-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500/70" />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      <Card className="border-border/80">
-        <CardContent className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight">
-              {workout ? "Continue your workout" : "Generate a workout"}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {workout
-                ? "Pick up where you left off, or generate a fresh plan."
-                : "A balanced session: one push, pull, leg, shoulder, and core exercise."}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button size="lg" onClick={handleStart}>
-              <Play className="size-4" />
-              {workout ? "Resume workout" : "Start workout"}
-            </Button>
-            <Button size="lg" variant="outline" onClick={handleGenerate}>
-              <RotateCcw className="size-4" />
-              Generate new
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {workout ? (
-        <WorkoutCard workout={workout} title="Today's plan" />
-      ) : (
-        <Card className="border-dashed border-border/70 bg-muted/20">
-          <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-            <div className="grid size-12 place-items-center rounded-full bg-muted">
-              <Dumbbell className="size-5 text-muted-foreground" />
-            </div>
+      {/* Main workout checklist pane */}
+      <div className="grid gap-6 md:grid-cols-3">
+        {/* Left pane: active day overview status */}
+        <div className="md:col-span-1 space-y-4">
+          <div className="rounded-2xl border border-zinc-850 bg-zinc-950 p-5 shadow-xl space-y-4 sticky top-24">
             <div>
-              <p className="text-sm font-medium">No workout queued yet</p>
-              <p className="text-xs text-muted-foreground">
-                Generate one to see your plan here.
+              <div className="flex items-center gap-1.5">
+                <span className="rounded bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
+                  {isRestDay ? "Rest" : "Active"}
+                </span>
+                <span className="text-xs text-zinc-500 font-semibold">{activeDay?.name}</span>
+              </div>
+              <h2 className="mt-2 text-xl font-bold tracking-tight text-white leading-tight">
+                {isRestDay ? "Rest & Recovery" : activeDay?.focus?.map(f => f.toUpperCase()).join(" + ")}
+              </h2>
+            </div>
+
+            {/* Display Stats or Details */}
+            {isRestDay ? (
+              <div className="rounded-xl bg-zinc-900/30 p-4 border border-zinc-900 text-center space-y-3 py-6">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-450 border border-emerald-500/20">
+                  <Activity className="h-6 w-6" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm font-bold text-white">Give muscles a break</h3>
+                  <p className="text-xs text-zinc-500 leading-relaxed px-2">
+                    Rest days are crucial for muscle hypertrophy and recovery. Drink water, focus on sleep, and active stretching.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Progress Circle bar */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-zinc-500">Progress Checklist</span>
+                    <span className="text-emerald-450">{completionPercentage}%</span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-zinc-900 overflow-hidden border border-zinc-850">
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-450 transition-all duration-500"
+                      style={{ width: `${completionPercentage}%` }}
+                    />
+                  </div>
+                  <div className="text-[11px] text-zinc-500 text-center">
+                    {activeCompletedCount} of {activeTotalCount} exercises finished
+                  </div>
+                </div>
+
+                {/* Workout Timer */}
+                <div className="rounded-xl bg-zinc-900/30 p-4 border border-zinc-900 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-800 text-zinc-400">
+                      <Clock className="h-4.5 w-4.5" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Time Active</div>
+                      <div className="text-sm font-extrabold text-white font-mono">
+                        {formatTime(secondsElapsed)}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={() => setWorkoutActive(!workoutActive)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-300 ${
+                      workoutActive
+                        ? "bg-zinc-800 text-zinc-300 hover:text-white"
+                        : "bg-emerald-500/10 text-emerald-450 border border-emerald-500/20 hover:bg-emerald-500/20"
+                    }`}
+                  >
+                    {workoutActive ? "Pause" : "Resume"}
+                  </button>
+                </div>
+
+                {/* Actions: Finish Workout or Regenerate */}
+                <div className="pt-2 space-y-2">
+                  <button
+                    onClick={handleFinishWorkout}
+                    disabled={activeCompletedCount === 0}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3 text-sm font-extrabold text-black hover:bg-emerald-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-emerald-500/15"
+                  >
+                    <CheckCircle2 className="h-4.5 w-4.5" />
+                    Finish Workout
+                  </button>
+                  
+                  <button
+                    onClick={() => regenerateSpecificDay(activeDayId)}
+                    className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/40 py-2.5 text-xs font-bold text-zinc-400 hover:bg-zinc-900 hover:text-white transition-all duration-300"
+                  >
+                    <RotateCw className="h-3.5 w-3.5" />
+                    Regenerate Exercises
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right pane: list of exercise cards */}
+        <div className="md:col-span-2 space-y-4">
+          {!isRestDay && activeDay ? (
+            activeDay.exercises.map((ex) => (
+              <ExerciseCard
+                key={ex.id}
+                exercise={ex}
+                onToggleComplete={handleToggleComplete}
+                onSwapClick={(e) => setSwapTarget(e)}
+              />
+            ))
+          ) : isRestDay ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-zinc-850 rounded-2xl bg-zinc-950/20">
+              <Calendar className="h-10 w-10 text-zinc-650 mb-3" />
+              <h3 className="text-base font-bold text-zinc-400">Rest Day Selected</h3>
+              <p className="text-xs text-zinc-550 max-w-xs mt-1 leading-relaxed">
+                Take a break, relax, and log some steps or focus on mobility. Tap another day above to see workout plans.
               </p>
             </div>
-            <Button onClick={handleGenerate}>Generate workout</Button>
-          </CardContent>
-        </Card>
+          ) : (
+            <div className="text-center py-10 text-zinc-500">Loading daily workout...</div>
+          )}
+        </div>
+      </div>
+
+      {/* Smart Swap Selector Modal overlay */}
+      {swapTarget && (
+        <ReplaceExerciseDialog
+          isOpen={true}
+          onClose={() => setSwapTarget(null)}
+          currentExercise={swapTarget}
+          onSelect={handleSwapExercise}
+        />
       )}
 
-      <div className="flex justify-between text-sm">
-        <Link to="/history" className="text-muted-foreground hover:text-foreground">
-          View history →
-        </Link>
-        <Link to="/progress" className="text-muted-foreground hover:text-foreground">
-          See progress →
-        </Link>
-      </div>
+      {/* Success Congratulations Modal */}
+      {showSuccessModal && lastCompletedWorkout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in">
+          <div className="relative max-w-sm w-full rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-center text-white shadow-2xl space-y-5">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Trophy className="h-7 w-7 text-emerald-450 animate-bounce" />
+            </div>
+
+            <div className="space-y-1.5">
+              <h2 className="text-2xl font-black tracking-tight">Workout Completed!</h2>
+              <p className="text-zinc-400 text-xs">
+                Awesome work finishing <strong className="text-white">{lastCompletedWorkout.dayName}</strong>. Progress saved!
+              </p>
+            </div>
+
+            <div className="divide-y divide-zinc-900 rounded-xl border border-zinc-900 bg-zinc-900/10 px-4 py-1 text-left text-xs">
+              <div className="flex justify-between py-2.5">
+                <span className="text-zinc-550 font-medium">Split Target</span>
+                <span className="text-white font-bold">{lastCompletedWorkout.split.split(" ")[0]}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-zinc-550 font-medium">Exercises Checked</span>
+                <span className="text-white font-bold">{lastCompletedWorkout.completedCount} / {lastCompletedWorkout.totalCount}</span>
+              </div>
+              <div className="flex justify-between py-2.5">
+                <span className="text-zinc-550 font-medium">Total Duration</span>
+                <span className="text-emerald-400 font-bold font-mono">{lastCompletedWorkout.duration}</span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-extrabold text-black hover:bg-emerald-450 transition-all duration-300"
+            >
+              Continue Plan
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

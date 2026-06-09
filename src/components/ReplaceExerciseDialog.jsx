@@ -1,119 +1,158 @@
-import { useMemo, useState } from "react";
-import { Search, ArrowRightLeft } from "lucide-react";
+import React, { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { getAlternativesFor, CATEGORY_LABELS } from "@/data/exercises";
-import { cn } from "@/lib/utils";
+  DialogDescription,
+} from "./ui/dialog";
+import { exercises } from "../data/exercises";
+import { Search, RotateCw, Sparkles } from "lucide-react";
 
-export function ReplaceExerciseDialog({ open, onOpenChange, current, onReplace }) {
-  const [query, setQuery] = useState("");
-  const [pickedId, setPickedId] = useState(null);
+export default function ReplaceExerciseDialog({
+  isOpen,
+  onClose,
+  currentExercise,
+  onSelect,
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEquipment, setSelectedEquipment] = useState("all");
 
-  const alternatives = useMemo(() => getAlternativesFor(current), [current]);
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return alternatives;
-    return alternatives.filter(
-      (e) =>
-        e.name.toLowerCase().includes(q) ||
-        e.equipment.some((eq) => eq.toLowerCase().includes(q)) ||
-        e.muscles.some((m) => m.toLowerCase().includes(q)),
-    );
-  }, [alternatives, query]);
+  const category = currentExercise?.category || "";
+  const currentId = currentExercise?.id || "";
 
-  function handleClose(next) {
-    onOpenChange(next);
-    if (!next) {
-      setQuery("");
-      setPickedId(null);
-    }
-  }
+  // Filter exercises that belong to the same category and are not the current exercise
+  const alternatives = useMemo(() => {
+    if (!category) return [];
+    
+    return exercises.filter((ex) => {
+      // Must be same category
+      if (ex.category !== category) return false;
+      // Cannot be the active one
+      if (ex.id === currentId) return false;
+      
+      // Filter by search query
+      if (
+        searchQuery &&
+        !ex.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false;
+      }
+      
+      // Filter by equipment
+      if (selectedEquipment !== "all" && ex.equipment !== selectedEquipment) {
+        return false;
+      }
+      
+      return true;
+    });
+  }, [category, currentId, searchQuery, selectedEquipment]);
 
-  function handleConfirm() {
-    if (!pickedId) return;
-    onReplace(pickedId);
-    handleClose(false);
-  }
-
-  if (!current) return null;
+  if (!currentExercise) return null;
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] gap-3 sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <ArrowRightLeft className="size-4" />
-            Replace exercise
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md border border-zinc-800 bg-zinc-950 text-white rounded-2xl p-5 overflow-hidden flex flex-col max-h-[85vh]">
+        <DialogHeader className="pb-3 border-b border-zinc-900">
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-emerald-400" />
+            Swap Exercise
           </DialogTitle>
-          <DialogDescription>
-            Swap <span className="font-medium text-foreground">{current.name}</span> for
-            another <Badge variant="outline" className="ml-1 text-[10px] uppercase">
-              {CATEGORY_LABELS[current.category]}
-            </Badge> movement. Your workout balance stays the same.
+          <DialogDescription className="text-zinc-400">
+            Replace <span className="text-white font-medium">{currentExercise.name}</span> with a matching <span className="text-emerald-450 font-medium">{category.toUpperCase()}</span> alternative.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative">
-          <Search className="pointer-events-none absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search alternatives…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="h-9 pl-8"
-            autoFocus
-          />
-        </div>
+        {/* Search & Filters */}
+        <div className="space-y-3.5 py-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-500" />
+            <input
+              type="text"
+              placeholder="Search exercises..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            />
+          </div>
 
-        <ScrollArea className="h-72 rounded-lg border border-border/60">
-          <div className="flex flex-col p-1">
-            {filtered.length === 0 ? (
-              <p className="p-6 text-center text-sm text-muted-foreground">
-                No matches.
-              </p>
-            ) : (
-              filtered.map((ex) => {
-                const selected = pickedId === ex.id;
-                return (
-                  <button
-                    key={ex.id}
-                    type="button"
-                    onClick={() => setPickedId(ex.id)}
-                    className={cn(
-                      "flex flex-col gap-1 rounded-md px-3 py-2 text-left text-sm transition-colors",
-                      selected
-                        ? "bg-primary/10 text-foreground ring-1 ring-primary/40"
-                        : "hover:bg-muted",
-                    )}
-                  >
-                    <span className="font-medium">{ex.name}</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      {ex.equipment.join(" · ")} · {ex.muscles.slice(0, 3).join(", ")}
-                    </span>
-                  </button>
-                );
-              })
+          {/* Equipment Pills */}
+          <div className="flex flex-wrap gap-1.5">
+            {["all", "barbell", "dumbbell", "machine", "cable", "bodyweight"].map(
+              (eq) => (
+                <button
+                  key={eq}
+                  onClick={() => setSelectedEquipment(eq)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 border ${
+                    selectedEquipment === eq
+                      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                      : "bg-zinc-900/40 text-zinc-400 border-zinc-800/80 hover:bg-zinc-800/60"
+                  }`}
+                >
+                  {eq}
+                </button>
+              )
             )}
           </div>
-        </ScrollArea>
+        </div>
 
-        <DialogFooter className="gap-2 sm:gap-2">
-          <Button variant="ghost" onClick={() => handleClose(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleConfirm} disabled={!pickedId}>
-            Swap exercise
-          </Button>
-        </DialogFooter>
+        {/* Alternatives List */}
+        <div className="flex-1 overflow-y-auto pr-1 space-y-2.5 min-h-[250px] max-h-[40vh] scrollbar-thin">
+          {alternatives.length > 0 ? (
+            alternatives.map((alt) => (
+              <div
+                key={alt.id}
+                className="flex items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/25 p-3.5 hover:border-zinc-700/80 transition-all duration-300 hover:bg-zinc-900/50"
+              >
+                <div className="min-w-0">
+                  <h4 className="text-sm font-bold text-white truncate">
+                    {alt.name}
+                  </h4>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="rounded bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-400 uppercase tracking-wide border border-zinc-800">
+                      {alt.equipment}
+                    </span>
+                    {alt.muscles.slice(0, 2).map((muscle) => (
+                      <span
+                        key={muscle}
+                        className="text-[10px] text-zinc-500"
+                      >
+                        • {muscle}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    onSelect(alt.id);
+                    onClose();
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-black hover:border-emerald-500 transition-all duration-300 active:scale-95"
+                >
+                  <RotateCw className="h-3.5 w-3.5" />
+                  Swap
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-center">
+              <p className="text-sm text-zinc-500">
+                No matching alternative exercises found.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedEquipment("all");
+                }}
+                className="mt-3 text-xs font-semibold text-emerald-400 hover:underline"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
