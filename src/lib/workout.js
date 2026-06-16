@@ -206,14 +206,15 @@ export function generateExercisesForFocus(focusCategories, count, allowedEquipme
   const selectedIds = new Set();
 
   if (focusCategories.length > 1) {
-    // Try to pick one from each focus category first
-    focusCategories.forEach(cat => {
+    // Try to pick one from each focus category first, up to the requested count
+    for (const cat of focusCategories) {
+      if (result.length >= count) break;
       const match = shuffled.find(ex => exerciseMatchesFocus(ex, cat) && !selectedIds.has(ex.id));
       if (match) {
         result.push({ ...match, completed: false });
         selectedIds.add(match.id);
       }
-    });
+    }
   }
 
   // Fill up the rest of the exercises randomly
