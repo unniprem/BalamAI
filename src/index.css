@@ -94,6 +94,19 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    --app-bg: #0f172a;
+    --app-surface: rgb(255 255 255 / 0.06);
+    --app-surface-2: rgb(255 255 255 / 0.04);
+    --app-surface-dim: rgb(255 255 255 / 0.03);
+    --app-border: rgb(255 255 255 / 0.10);
+    --app-border-subtle: rgb(255 255 255 / 0.06);
+    --app-text: #f1f5f9;
+    --app-text-2: #94a3b8;
+    --app-text-3: #64748b;
+    --app-hover: rgb(255 255 255 / 0.04);
+    --app-nav: #0f172a;
+    --app-nav-border: rgb(255 255 255 / 0.08);
+    --app-input: rgb(255 255 255 / 0.05);
 }
 
 .dark {
