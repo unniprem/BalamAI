@@ -31,7 +31,7 @@ export default function Dashboard() {
     const storedSettingsString = localStorage.getItem("balamai_stored_settings_key");
     const initialSettings = loadSettings();
     const settingsStr = JSON.stringify(initialSettings);
-    
+
     if (storedSchedule && storedSettingsString === settingsStr) {
       return JSON.parse(storedSchedule);
     } else {
@@ -51,7 +51,7 @@ export default function Dashboard() {
   const [activeDayId, setActiveDayId] = useState("day-1");
   const [showSettings, setShowSettings] = useState(false);
   const [swapTarget, setSwapTarget] = useState(null); // exercise to swap
-  
+
   // Timer State
   const [workoutActive, setWorkoutActive] = useState(false);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
@@ -107,7 +107,7 @@ export default function Dashboard() {
     });
 
     setShowDayCustomize(false);
-    
+
     // Reset timer
     setWorkoutActive(false);
     setSecondsElapsed(0);
@@ -171,7 +171,7 @@ export default function Dashboard() {
   // --- Schedule Generation ---
   const regenerateWholeSchedule = useCallback((currentSettings) => {
     const layout = getWeeklySplitLayout(currentSettings.split, currentSettings.days);
-    
+
     // For each active day, generate a list of exercises
     const fullSchedule = layout.map((day) => {
       if (day.rest) {
@@ -215,14 +215,14 @@ export default function Dashboard() {
     setSettings((prevSettings) => {
       const updatedSettings = { ...prevSettings, [key]: value };
       saveSettings(updatedSettings);
-      
+
       // Reset timer
       setWorkoutActive(false);
       setSecondsElapsed(0);
 
       // Regenerate schedule
       regenerateWholeSchedule(updatedSettings);
-      
+
       return updatedSettings;
     });
   }, [regenerateWholeSchedule]);
@@ -283,7 +283,7 @@ export default function Dashboard() {
 
   const handleFinishWorkout = useCallback(() => {
     if (!activeDay || isRestDay) return;
-    
+
     const completed = activeDay.exercises.filter((ex) => ex.completed);
     if (completed.length === 0) {
       alert("Please complete at least one exercise before finishing the workout!");
@@ -332,10 +332,10 @@ export default function Dashboard() {
       localStorage.setItem("balamai_weekly_schedule", JSON.stringify(updated));
       return updated;
     });
-    
+
     // Reset timer state
     setSecondsElapsed(0);
-    
+
     // Update settings in state to reflect new streak
     setSettings(loadSettings());
   }, [activeDay, isRestDay, secondsElapsed, settings, activeDayId, formatTime]);
@@ -352,10 +352,10 @@ export default function Dashboard() {
       {/* Upper header segment: Welcome details */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-app-text sm:text-4xl">
             My Workout Plan
           </h1>
-          <p className="mt-1.5 text-zinc-400 text-sm">
+          <p className="mt-1.5 text-app-text-2 text-sm">
             Configure your week, customize exercises, and track your training offline.
           </p>
         </div>
@@ -366,7 +366,7 @@ export default function Dashboard() {
           className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
             showSettings
               ? "bg-emerald-500 text-black shadow-md shadow-emerald-500/20"
-              : "bg-zinc-900 text-zinc-350 border border-zinc-800 hover:text-white"
+              : "bg-app-surface-2 text-app-text-2 border border-app-border hover:text-app-text"
           }`}
         >
           <Settings className={`h-4.5 w-4.5 ${showSettings ? "animate-spin-once" : ""}`} />
@@ -376,22 +376,22 @@ export default function Dashboard() {
 
       {/* Configuration Section (Dropdown panel) */}
       {showSettings && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-xl animate-in fade-in-50 slide-in-from-top-4 duration-300">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <div className="rounded-2xl border border-app-border bg-app-bg p-6 shadow-xl animate-in fade-in-50 slide-in-from-top-4 duration-300">
+          <h2 className="text-lg font-bold text-app-text mb-4 flex items-center gap-2">
             <Settings className="h-5 w-5 text-emerald-400" />
             Customize Settings
           </h2>
-          
+
           <div className="grid gap-6 md:grid-cols-4">
             {/* Goal Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-app-text-3">
                 Fitness Goal
               </label>
               <select
                 value={settings.goal}
                 onChange={(e) => handleSettingChange("goal", e.target.value)}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-app-border bg-app-surface-2 p-3 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               >
                 <option value="lose-fat">Lose Fat / Cardio</option>
                 <option value="strength">Weight Strengthening / Power</option>
@@ -401,13 +401,13 @@ export default function Dashboard() {
 
             {/* Split Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-app-text-3">
                 Split Type
               </label>
               <select
                 value={settings.split}
                 onChange={(e) => handleSettingChange("split", e.target.value)}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-app-border bg-app-surface-2 p-3 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               >
                 <option value="bro">Bro Split (Target Single Focus)</option>
                 <option value="push-pull">Push-Pull-Legs (PPL)</option>
@@ -417,13 +417,13 @@ export default function Dashboard() {
 
             {/* Days per week */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-app-text-3">
                 Active Days
               </label>
               <select
                 value={settings.days}
                 onChange={(e) => handleSettingChange("days", parseInt(e.target.value))}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-app-border bg-app-surface-2 p-3 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               >
                 <option value="3">3 Days / Week</option>
                 <option value="4">4 Days / Week</option>
@@ -434,13 +434,13 @@ export default function Dashboard() {
 
             {/* Exercises per day */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-app-text-3">
                 Exercises / Day
               </label>
               <select
                 value={settings.exerciseCount}
                 onChange={(e) => handleSettingChange("exerciseCount", parseInt(e.target.value))}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                className="w-full rounded-xl border border-app-border bg-app-surface-2 p-3 text-sm text-app-text outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               >
                 <option value="4">4 Exercises</option>
                 <option value="5">5 Exercises</option>
@@ -451,12 +451,12 @@ export default function Dashboard() {
           </div>
 
           {/* Equipment Availability Selection */}
-          <div className="mt-6 border-t border-zinc-900 pt-5 space-y-3">
+          <div className="mt-6 border-t border-app-border-subtle pt-5 space-y-3">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
+              <label className="text-xs font-semibold uppercase tracking-wider text-app-text-3">
                 Available Equipment
               </label>
-              <span className="text-[10px] text-zinc-550">
+              <span className="text-[10px] text-app-text-3">
                 Limit your generated routines and exercise swaps to equipment you actually have.
               </span>
             </div>
@@ -481,7 +481,7 @@ export default function Dashboard() {
                     className={`rounded-xl px-3.5 py-2 text-xs font-semibold uppercase tracking-wider transition-all duration-300 border ${
                       isSelected
                         ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                        : "bg-zinc-900/40 text-zinc-400 border-zinc-850 hover:bg-zinc-800/60 hover:text-white"
+                        : "bg-app-surface-2 text-app-text-2 border-app-border hover:bg-app-hover hover:text-app-text"
                     }`}
                   >
                     {eq}
@@ -491,13 +491,13 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="mt-6 pt-5 border-t border-zinc-900 flex justify-between items-center flex-wrap gap-3">
-            <span className="text-xs text-zinc-400">
-              Active configuration: <strong className="text-white">{getGoalLabel(settings.goal)}</strong> with <strong className="text-white">{getSplitLabel(settings.split)}</strong> structure.
+          <div className="mt-6 pt-5 border-t border-app-border-subtle flex justify-between items-center flex-wrap gap-3">
+            <span className="text-xs text-app-text-2">
+              Active configuration: <strong className="text-app-text">{getGoalLabel(settings.goal)}</strong> with <strong className="text-app-text">{getSplitLabel(settings.split)}</strong> structure.
             </span>
             <button
               onClick={() => regenerateWholeSchedule(settings)}
-              className="flex items-center gap-1.5 rounded-xl bg-zinc-900 border border-zinc-800 px-4.5 py-2 text-xs font-semibold text-white hover:bg-zinc-850 transition-all duration-355 active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl bg-app-surface-2 border border-app-border px-4.5 py-2 text-xs font-semibold text-app-text hover:bg-app-hover transition-all duration-355 active:scale-95"
             >
               <RotateCw className="h-3.5 w-3.5" />
               Regenerate Full Week
@@ -507,10 +507,10 @@ export default function Dashboard() {
       )}
 
       {/* Timeline of the Week (7 Calendar Days layout) */}
-      <div className="rounded-2xl border border-zinc-850 bg-zinc-950 p-4 shadow-xl overflow-hidden">
+      <div className="rounded-2xl border border-app-border bg-app-bg p-4 shadow-xl overflow-hidden">
         <div className="flex items-center gap-2 mb-3.5 px-1">
-          <Calendar className="h-4.5 w-4.5 text-emerald-450" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">Weekly Schedule</h2>
+          <Calendar className="h-4.5 w-4.5 text-emerald-400" />
+          <h2 className="text-sm font-bold text-app-text uppercase tracking-wider">Weekly Schedule</h2>
         </div>
 
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-7">
@@ -524,17 +524,17 @@ export default function Dashboard() {
                 onClick={() => setActiveDayId(day.id)}
                 className={`flex flex-col items-center p-3.5 rounded-xl text-center transition-all duration-300 border relative ${
                   isActive
-                    ? "bg-emerald-500/10 border-emerald-500 text-white scale-[1.02] shadow-md shadow-emerald-500/5"
+                    ? "bg-emerald-500/10 border-emerald-500 text-app-text scale-[1.02] shadow-md shadow-emerald-500/5"
                     : isDayRest
-                    ? "bg-zinc-900/15 border-zinc-850/60 text-zinc-500 hover:bg-zinc-900/30"
-                    : "bg-zinc-900/40 border-zinc-800/80 text-zinc-300 hover:border-zinc-700/80 hover:bg-zinc-900/60"
+                    ? "bg-app-surface-dim border-app-border text-app-text-3 hover:bg-app-hover"
+                    : "bg-app-surface-2 border-app-border text-app-text-2 hover:border-emerald-500/20 hover:bg-app-hover"
                 }`}
               >
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                <span className="text-[10px] font-bold text-app-text-3 uppercase tracking-widest">
                   {day.id.replace("-", " ")}
                 </span>
-                
-                <span className={`mt-2.5 text-xs font-bold leading-none ${isActive ? "text-emerald-400" : isDayRest ? "text-zinc-650" : "text-zinc-250"}`}>
+
+                <span className={`mt-2.5 text-xs font-bold leading-none ${isActive ? "text-emerald-400" : isDayRest ? "text-app-text-3" : "text-app-text"}`}>
                   {isDayRest ? "REST" : day.focus.map(f => f.slice(0, 4).toUpperCase()).join("/")}
                 </span>
 
@@ -551,28 +551,28 @@ export default function Dashboard() {
       <div className="grid gap-6 md:grid-cols-3">
         {/* Left pane: active day overview status */}
         <div className="md:col-span-1 space-y-4">
-          <div className="rounded-2xl border border-zinc-850 bg-zinc-950 p-5 shadow-xl space-y-4 sticky top-24">
+          <div className="rounded-2xl border border-app-border bg-app-bg p-5 shadow-xl space-y-4 sticky top-24">
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="rounded bg-emerald-500/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
                   {isRestDay ? "Rest" : "Active"}
                 </span>
-                <span className="text-xs text-zinc-500 font-semibold">{activeDay?.name}</span>
+                <span className="text-xs text-app-text-3 font-semibold">{activeDay?.name}</span>
               </div>
-              <h2 className="mt-2 text-xl font-bold tracking-tight text-white leading-tight">
+              <h2 className="mt-2 text-xl font-bold tracking-tight text-app-text leading-tight">
                 {isRestDay ? "Rest & Recovery" : activeDay?.focus?.map(f => f.toUpperCase()).join(" + ")}
               </h2>
             </div>
 
             {/* Customize / Swap Buttons */}
-            <div className="flex gap-2 border-t border-zinc-900 pt-3">
+            <div className="flex gap-2 border-t border-app-border-subtle pt-3">
               <button
                 onClick={() => setShowDayCustomize(!showDayCustomize)}
-                className="flex-1 text-center rounded-xl bg-zinc-900 border border-zinc-805 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-850 transition-all duration-300"
+                className="flex-1 text-center rounded-xl bg-app-surface-2 border border-app-border py-2 text-xs font-semibold text-app-text-2 hover:text-app-text hover:bg-app-hover transition-all duration-300"
               >
                 {showDayCustomize ? "Cancel Edit" : "Configure Day"}
               </button>
-              
+
               {/* Swap Dropdown */}
               <div className="relative flex-1">
                 <select
@@ -583,7 +583,7 @@ export default function Dashboard() {
                       e.target.value = ""; // reset dropdown
                     }
                   }}
-                  className="w-full text-center rounded-xl bg-zinc-900 border border-zinc-805 py-2 text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-850 transition-all duration-300 appearance-none cursor-pointer outline-none"
+                  className="w-full text-center rounded-xl bg-app-surface-2 border border-app-border py-2 text-xs font-semibold text-app-text-2 hover:text-app-text hover:bg-app-hover transition-all duration-300 appearance-none cursor-pointer outline-none"
                 >
                   <option value="" disabled>Swap Day...</option>
                   {weeklySchedule
@@ -594,7 +594,7 @@ export default function Dashboard() {
                       </option>
                     ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-zinc-500">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-app-text-3">
                   <span className="text-[10px]">▼</span>
                 </div>
               </div>
@@ -602,10 +602,10 @@ export default function Dashboard() {
 
             {/* Customization Panel */}
             {showDayCustomize && (
-              <div className="rounded-xl border border-zinc-850 bg-zinc-900/40 p-4 space-y-4 animate-in fade-in duration-200">
+              <div className="rounded-xl border border-app-border bg-app-surface-2 p-4 space-y-4 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider">Configure Focus</span>
-                  
+                  <span className="text-xs font-bold text-app-text uppercase tracking-wider">Configure Focus</span>
+
                   {/* Rest Day Switcher */}
                   <button
                     type="button"
@@ -613,7 +613,7 @@ export default function Dashboard() {
                     className={`rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${
                       isCustomDayRest
                         ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-                        : "bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white"
+                        : "bg-app-bg text-app-text-2 border-app-border hover:text-app-text"
                     }`}
                   >
                     {isCustomDayRest ? "Rest Day" : "Set Rest"}
@@ -622,7 +622,7 @@ export default function Dashboard() {
 
                 {!isCustomDayRest && (
                   <div className="space-y-2">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest block">Select Muscle Groups / Categories</span>
+                    <span className="text-[10px] font-bold text-app-text-3 uppercase tracking-widest block">Select Muscle Groups / Categories</span>
                     <div className="grid grid-cols-2 gap-1.5">
                       {["chest", "back", "shoulders", "arms", "legs", "core", "push", "pull"].map((focusOption) => {
                         const isSelected = customDayFocuses.includes(focusOption);
@@ -639,8 +639,8 @@ export default function Dashboard() {
                             }}
                             className={`rounded-lg py-1.5 text-xs font-semibold capitalize border transition-all duration-200 ${
                               isSelected
-                                ? "bg-emerald-500/10 text-emerald-450 border-emerald-500/30"
-                                : "bg-zinc-950/40 text-zinc-400 border-zinc-850 hover:bg-zinc-900/60"
+                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                                : "bg-app-surface-dim text-app-text-2 border-app-border hover:bg-app-hover"
                             }`}
                           >
                             {focusOption}
@@ -664,13 +664,13 @@ export default function Dashboard() {
 
             {/* Display Stats or Details */}
             {isRestDay ? (
-              <div className="rounded-xl bg-zinc-900/30 p-4 border border-zinc-900 text-center space-y-3 py-6">
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-450 border border-emerald-500/20">
+              <div className="rounded-xl bg-app-surface-2 p-4 border border-app-border-subtle text-center space-y-3 py-6">
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   <Activity className="h-6 w-6" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-sm font-bold text-white">Give muscles a break</h3>
-                  <p className="text-xs text-zinc-500 leading-relaxed px-2">
+                  <h3 className="text-sm font-bold text-app-text">Give muscles a break</h3>
+                  <p className="text-xs text-app-text-3 leading-relaxed px-2">
                     Rest days are crucial for muscle hypertrophy and recovery. Drink water, focus on sleep, and active stretching.
                   </p>
                 </div>
@@ -680,40 +680,40 @@ export default function Dashboard() {
                 {/* Progress Circle bar */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-zinc-500">Progress Checklist</span>
-                    <span className="text-emerald-450">{completionPercentage}%</span>
+                    <span className="text-app-text-3">Progress Checklist</span>
+                    <span className="text-emerald-400">{completionPercentage}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-zinc-900 overflow-hidden border border-zinc-850">
+                  <div className="h-2 w-full rounded-full bg-app-surface-2 overflow-hidden border border-app-border">
                     <div
-                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-450 transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
                       style={{ width: `${completionPercentage}%` }}
                     />
                   </div>
-                  <div className="text-[11px] text-zinc-500 text-center">
+                  <div className="text-[11px] text-app-text-3 text-center">
                     {activeCompletedCount} of {activeTotalCount} exercises finished
                   </div>
                 </div>
 
                 {/* Workout Timer */}
-                <div className="rounded-xl bg-zinc-900/30 p-4 border border-zinc-900 flex items-center justify-between">
+                <div className="rounded-xl bg-app-surface-2 p-4 border border-app-border-subtle flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-800 text-zinc-400">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-app-hover text-app-text-2">
                       <Clock className="h-4.5 w-4.5" />
                     </div>
                     <div>
-                      <div className="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">Time Active</div>
-                      <div className="text-sm font-extrabold text-white font-mono">
+                      <div className="text-[10px] uppercase tracking-wider text-app-text-3 font-semibold">Time Active</div>
+                      <div className="text-sm font-extrabold text-app-text font-mono">
                         {formatTime(secondsElapsed)}
                       </div>
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={() => setWorkoutActive(!workoutActive)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-300 ${
                       workoutActive
-                        ? "bg-zinc-800 text-zinc-300 hover:text-white"
-                        : "bg-emerald-500/10 text-emerald-450 border border-emerald-500/20 hover:bg-emerald-500/20"
+                        ? "bg-app-surface-2 text-app-text-2 hover:text-app-text border border-app-border"
+                        : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20"
                     }`}
                   >
                     {workoutActive ? "Pause" : "Resume"}
@@ -730,10 +730,10 @@ export default function Dashboard() {
                     <CheckCircle2 className="h-4.5 w-4.5" />
                     Finish Workout
                   </button>
-                  
+
                   <button
                     onClick={() => regenerateSpecificDay(activeDayId)}
-                    className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/40 py-2.5 text-xs font-bold text-zinc-400 hover:bg-zinc-900 hover:text-white transition-all duration-300"
+                    className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-app-border bg-app-surface-2 py-2.5 text-xs font-bold text-app-text-2 hover:bg-app-hover hover:text-app-text transition-all duration-300"
                   >
                     <RotateCw className="h-3.5 w-3.5" />
                     Regenerate Exercises
@@ -756,15 +756,15 @@ export default function Dashboard() {
               />
             ))
           ) : isRestDay ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-zinc-850 rounded-2xl bg-zinc-950/20">
-              <Calendar className="h-10 w-10 text-zinc-650 mb-3" />
-              <h3 className="text-base font-bold text-zinc-400">Rest Day Selected</h3>
-              <p className="text-xs text-zinc-550 max-w-xs mt-1 leading-relaxed">
+            <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-app-border rounded-2xl bg-app-surface-dim">
+              <Calendar className="h-10 w-10 text-app-text-3 mb-3" />
+              <h3 className="text-base font-bold text-app-text-2">Rest Day Selected</h3>
+              <p className="text-xs text-app-text-3 max-w-xs mt-1 leading-relaxed">
                 Take a break, relax, and log some steps or focus on mobility. Tap another day above to see workout plans.
               </p>
             </div>
           ) : (
-            <div className="text-center py-10 text-zinc-500">Loading daily workout...</div>
+            <div className="text-center py-10 text-app-text-3">Loading daily workout...</div>
           )}
         </div>
       </div>
@@ -784,36 +784,36 @@ export default function Dashboard() {
       {/* Success Congratulations Modal */}
       {showSuccessModal && lastCompletedWorkout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in">
-          <div className="relative max-w-sm w-full rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-center text-white shadow-2xl space-y-5">
+          <div className="relative max-w-sm w-full rounded-2xl border border-app-border bg-app-bg p-6 text-center text-app-text shadow-2xl space-y-5">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Trophy className="h-7 w-7 text-emerald-450 animate-bounce" />
+              <Trophy className="h-7 w-7 text-emerald-400 animate-bounce" />
             </div>
 
             <div className="space-y-1.5">
               <h2 className="text-2xl font-black tracking-tight">Workout Completed!</h2>
-              <p className="text-zinc-400 text-xs">
-                Awesome work finishing <strong className="text-white">{lastCompletedWorkout.dayName}</strong>. Progress saved!
+              <p className="text-app-text-2 text-xs">
+                Awesome work finishing <strong className="text-app-text">{lastCompletedWorkout.dayName}</strong>. Progress saved!
               </p>
             </div>
 
-            <div className="divide-y divide-zinc-900 rounded-xl border border-zinc-900 bg-zinc-900/10 px-4 py-1 text-left text-xs">
+            <div className="divide-y divide-app-border-subtle rounded-xl border border-app-border-subtle bg-app-surface-dim px-4 py-1 text-left text-xs">
               <div className="flex justify-between py-2.5">
-                <span className="text-zinc-550 font-medium">Split Target</span>
-                <span className="text-white font-bold">{lastCompletedWorkout.split.split(" ")[0]}</span>
+                <span className="text-app-text-3 font-medium">Split Target</span>
+                <span className="text-app-text font-bold">{lastCompletedWorkout.split.split(" ")[0]}</span>
               </div>
               <div className="flex justify-between py-2.5">
-                <span className="text-zinc-550 font-medium">Exercises Checked</span>
-                <span className="text-white font-bold">{lastCompletedWorkout.completedCount} / {lastCompletedWorkout.totalCount}</span>
+                <span className="text-app-text-3 font-medium">Exercises Checked</span>
+                <span className="text-app-text font-bold">{lastCompletedWorkout.completedCount} / {lastCompletedWorkout.totalCount}</span>
               </div>
               <div className="flex justify-between py-2.5">
-                <span className="text-zinc-550 font-medium">Total Duration</span>
+                <span className="text-app-text-3 font-medium">Total Duration</span>
                 <span className="text-emerald-400 font-bold font-mono">{lastCompletedWorkout.duration}</span>
               </div>
             </div>
 
             <button
               onClick={() => setShowSuccessModal(false)}
-              className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-extrabold text-black hover:bg-emerald-450 transition-all duration-300"
+              className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-extrabold text-black hover:bg-emerald-400 transition-all duration-300"
             >
               Continue Plan
             </button>
