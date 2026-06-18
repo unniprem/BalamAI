@@ -8,7 +8,7 @@ import {
 } from "./ui/dialog";
 import { exercises } from "../data/exercises";
 import { Search, RotateCw, Sparkles } from "lucide-react";
-import { exerciseMatchesFocus } from "../lib/workout";
+import { exerciseMatchesFocus, getExerciseDisplayCategory } from "../lib/workout";
 
 export default function ReplaceExerciseDialog({
   isOpen,
@@ -23,12 +23,17 @@ export default function ReplaceExerciseDialog({
 
   const currentId = currentExercise?.id || "";
 
-  // Determine which focus category of the day matches the current exercise
+  // Determine the most specific focus category for the current exercise.
+  // Prefers the display category (e.g. "chest") over a broad one (e.g. "push")
+  // when both appear in focusCategories, fixing the push+chest ordering ambiguity.
   const focus = useMemo(() => {
-    if (!currentExercise || !focusCategories || focusCategories.length === 0) {
-      return currentExercise?.category || "";
+    if (!currentExercise) return "";
+    const displayCat = getExerciseDisplayCategory(currentExercise);
+    if (focusCategories && focusCategories.includes(displayCat)) return displayCat;
+    if (focusCategories && focusCategories.length > 0) {
+      return focusCategories.find(f => exerciseMatchesFocus(currentExercise, f)) || currentExercise.category;
     }
-    return focusCategories.find(f => exerciseMatchesFocus(currentExercise, f)) || currentExercise.category;
+    return currentExercise.category || "";
   }, [currentExercise, focusCategories]);
 
   // Filter exercises that belong to the same focus category and are not the current exercise
@@ -137,7 +142,7 @@ export default function ReplaceExerciseDialog({
                     <span className="rounded bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-400 uppercase tracking-wide border border-zinc-800">
                       {alt.equipment}
                     </span>
-                    {alt.muscles.slice(0, 2).map((muscle) => (
+                    {(alt.muscles || []).slice(0, 2).map((muscle) => (
                       <span
                         key={muscle}
                         className="text-[10px] text-zinc-500"

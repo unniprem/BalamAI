@@ -1,5 +1,29 @@
 import { exercises } from "../data/exercises.js";
 
+const SHOULDER_MUSCLES = ["shoulders", "deltoids", "rear deltoids", "delts"];
+const CHEST_MUSCLES = ["chest", "pectorals", "upper chest"];
+const BACK_MUSCLES = ["back", "lats", "rhomboids", "traps", "trapezius", "upper back", "lower back"];
+const ARM_MUSCLES = ["biceps", "triceps", "forearms"];
+const CORE_MUSCLES = ["core", "abs", "obliques", "lower abs"];
+
+/**
+ * Returns a display category for an exercise: chest, back, arms, shoulders, legs, core.
+ * Falls back to the exercise's base category.
+ * @param {Object} exercise
+ * @returns {string}
+ */
+export function getExerciseDisplayCategory(exercise) {
+  const muscles = exercise.muscles || [];
+  if (exercise.category === "legs") return "legs";
+  if (exercise.category === "core") return "core";
+  // Check chest before shoulders — push exercises with deltoids in muscles are chest, not shoulders
+  if (exercise.category === "push" && muscles.some(m => CHEST_MUSCLES.includes(m))) return "chest";
+  if (exercise.category === "shoulders" || muscles.some(m => SHOULDER_MUSCLES.includes(m))) return "shoulders";
+  if (exercise.category === "pull" && muscles.some(m => BACK_MUSCLES.includes(m))) return "back";
+  if (muscles.some(m => ARM_MUSCLES.includes(m))) return "arms";
+  return exercise.category;
+}
+
 /**
  * Checks if an exercise matches a given focus category.
  * Supports both split categories ("push", "pull", "legs", "shoulders", "core")
@@ -9,50 +33,16 @@ import { exercises } from "../data/exercises.js";
  * @returns {boolean}
  */
 export function exerciseMatchesFocus(exercise, focus) {
-  if (focus === "push") {
-    return exercise.category === "push";
-  }
-  if (focus === "pull") {
-    return exercise.category === "pull";
-  }
-  if (focus === "legs") {
-    return exercise.category === "legs";
-  }
-  if (focus === "shoulders") {
-    return exercise.category === "shoulders" || exercise.muscles.some(m => ["shoulders", "deltoids", "rear deltoids", "delts"].includes(m));
-  }
-  if (focus === "core") {
-    return exercise.category === "core" || exercise.muscles.some(m => ["core", "abs", "obliques", "lower abs"].includes(m));
-  }
-
-  // Bro-split / muscle group matching
-  if (focus === "chest") {
-    return exercise.category === "push" && exercise.muscles.some(m => ["chest", "pectorals", "upper chest"].includes(m));
-  }
-  if (focus === "back") {
-    return exercise.category === "pull" && exercise.muscles.some(m => ["back", "lats", "rhomboids", "traps", "trapezius", "upper back", "lower back"].includes(m));
-  }
-  if (focus === "arms") {
-    return (exercise.category === "push" || exercise.category === "pull") && exercise.muscles.some(m => ["biceps", "triceps", "forearms"].includes(m));
-  }
-
-  return false;
-}
-
-/**
- * Returns a display category for an exercise matching chest, back, arms, shoulders, legs, core.
- * Falls back to base database category.
- * @param {Object} exercise
- * @returns {string}
- */
-export function getExerciseDisplayCategory(exercise) {
-  if (exercise.category === "legs") return "legs";
-  if (exercise.category === "core") return "core";
-  if (exercise.category === "shoulders" || exercise.muscles.some(m => ["shoulders", "deltoids", "rear deltoids", "delts"].includes(m))) return "shoulders";
-  if (exercise.category === "push" && exercise.muscles.some(m => ["chest", "pectorals", "upper chest"].includes(m))) return "chest";
-  if (exercise.category === "pull" && exercise.muscles.some(m => ["back", "lats", "rhomboids", "traps", "trapezius", "upper back", "lower back"].includes(m))) return "back";
-  if (exercise.muscles.some(m => ["biceps", "triceps", "forearms"].includes(m))) return "arms";
-  return exercise.category;
+  const muscles = exercise.muscles || [];
+  if (focus === "push") return exercise.category === "push";
+  if (focus === "pull") return exercise.category === "pull";
+  if (focus === "legs") return exercise.category === "legs";
+  if (focus === "shoulders") return exercise.category === "shoulders" || muscles.some(m => SHOULDER_MUSCLES.includes(m));
+  if (focus === "core") return exercise.category === "core" || muscles.some(m => CORE_MUSCLES.includes(m));
+  // Muscle-group specifics delegate to getExerciseDisplayCategory to stay in sync
+  if (focus === "chest" || focus === "back" || focus === "arms") return getExerciseDisplayCategory(exercise) === focus;
+  // Unknown focus: direct category match as fallback
+  return exercise.category === focus;
 }
 
 /**
