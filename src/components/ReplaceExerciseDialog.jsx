@@ -81,14 +81,14 @@ export default function ReplaceExerciseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md border border-zinc-800 bg-zinc-950 text-white rounded-2xl p-5 overflow-hidden flex flex-col max-h-[85vh]">
-        <DialogHeader className="pb-3 border-b border-zinc-900">
+      <DialogContent className="max-w-md border border-app-border bg-app-bg text-app-text rounded-2xl p-5 overflow-hidden flex flex-col max-h-[85vh]">
+        <DialogHeader className="pb-3 border-b border-app-border-subtle">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-emerald-400" />
             Swap Exercise
           </DialogTitle>
-          <DialogDescription className="text-zinc-400">
-            Replace <span className="text-white font-medium">{currentExercise.name}</span> with a matching <span className="text-emerald-450 font-medium">{focus.toUpperCase()}</span> alternative.
+          <DialogDescription className="text-app-text-2">
+            Replace <span className="text-app-text font-medium">{currentExercise.name}</span> with a matching <span className="text-emerald-400 font-medium">{focus.toUpperCase()}</span> alternative.
           </DialogDescription>
         </DialogHeader>
 
@@ -96,13 +96,13 @@ export default function ReplaceExerciseDialog({
         <div className="space-y-3.5 py-3">
           {/* Search Input */}
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-zinc-500" />
+            <Search className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-app-text-3" />
             <input
               type="text"
               placeholder="Search exercises..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 pl-11 pr-4 text-sm text-white placeholder-zinc-500 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+              className="w-full rounded-xl border border-app-border bg-app-input py-2.5 pl-11 pr-4 text-sm text-app-text placeholder:text-app-text-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
             />
           </div>
 
@@ -116,7 +116,7 @@ export default function ReplaceExerciseDialog({
                   className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider transition-all duration-300 border ${
                     selectedEquipment === eq
                       ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                      : "bg-zinc-900/40 text-zinc-400 border-zinc-800/80 hover:bg-zinc-800/60"
+                      : "bg-app-surface-2 text-app-text-2 border-app-border hover:bg-app-hover"
                   }`}
                 >
                   {eq}
@@ -132,20 +132,20 @@ export default function ReplaceExerciseDialog({
             alternatives.map((alt) => (
               <div
                 key={alt.id}
-                className="flex items-center justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/25 p-3.5 hover:border-zinc-700/80 transition-all duration-300 hover:bg-zinc-900/50"
+                className="flex items-center justify-between gap-4 rounded-xl border border-app-border bg-app-surface-dim p-3.5 hover:border-emerald-500/20 transition-all duration-300 hover:bg-app-hover"
               >
                 <div className="min-w-0">
-                  <h4 className="text-sm font-bold text-white truncate">
+                  <h4 className="text-sm font-bold text-app-text truncate">
                     {alt.name}
                   </h4>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="rounded bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-400 uppercase tracking-wide border border-zinc-800">
+                    <span className="rounded bg-app-surface-2 px-2 py-0.5 text-[10px] font-medium text-app-text-2 uppercase tracking-wide border border-app-border">
                       {alt.equipment}
                     </span>
                     {(alt.muscles || []).slice(0, 2).map((muscle) => (
                       <span
                         key={muscle}
-                        className="text-[10px] text-zinc-500"
+                        className="text-[10px] text-app-text-3"
                       >
                         • {muscle}
                       </span>
@@ -167,7 +167,7 @@ export default function ReplaceExerciseDialog({
             ))
           ) : (
             <div className="flex flex-col items-center justify-center py-10 text-center">
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-app-text-3">
                 No matching alternative exercises found.
               </p>
               <button

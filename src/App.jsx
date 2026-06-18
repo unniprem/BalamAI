@@ -6,7 +6,7 @@ import Progress from "./pages/Progress";
 
 function AppShell({ children }) {
   return (
-    <div className="flex min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex min-h-screen bg-app-bg text-app-text transition-colors duration-300">
       {/* Sidebar for Desktop layouts */}
       <DesktopSidebar />
       

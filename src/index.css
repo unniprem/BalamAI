@@ -46,6 +46,19 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --color-app-bg: var(--app-bg);
+    --color-app-surface: var(--app-surface);
+    --color-app-surface-2: var(--app-surface-2);
+    --color-app-surface-dim: var(--app-surface-dim);
+    --color-app-border: var(--app-border);
+    --color-app-border-subtle: var(--app-border-subtle);
+    --color-app-text: var(--app-text);
+    --color-app-text-2: var(--app-text-2);
+    --color-app-text-3: var(--app-text-3);
+    --color-app-hover: var(--app-hover);
+    --color-app-nav: var(--app-nav);
+    --color-app-nav-border: var(--app-nav-border);
+    --color-app-input: var(--app-input);
 }
 
 :root {
@@ -81,6 +94,19 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    --app-bg: #0f172a;
+    --app-surface: rgb(255 255 255 / 0.06);
+    --app-surface-2: rgb(255 255 255 / 0.04);
+    --app-surface-dim: rgb(255 255 255 / 0.03);
+    --app-border: rgb(255 255 255 / 0.10);
+    --app-border-subtle: rgb(255 255 255 / 0.06);
+    --app-text: #f1f5f9;
+    --app-text-2: #94a3b8;
+    --app-text-3: #64748b;
+    --app-hover: rgb(255 255 255 / 0.04);
+    --app-nav: #0f172a;
+    --app-nav-border: rgb(255 255 255 / 0.08);
+    --app-input: rgb(255 255 255 / 0.05);
 }
 
 .dark {
@@ -117,6 +143,38 @@
     --sidebar-ring: oklch(0.556 0 0);
 }
 
+[data-theme="dark"] {
+    --app-bg: #0f172a;
+    --app-surface: rgb(255 255 255 / 0.06);
+    --app-surface-2: rgb(255 255 255 / 0.04);
+    --app-surface-dim: rgb(255 255 255 / 0.03);
+    --app-border: rgb(255 255 255 / 0.10);
+    --app-border-subtle: rgb(255 255 255 / 0.06);
+    --app-text: #f1f5f9;
+    --app-text-2: #94a3b8;
+    --app-text-3: #64748b;
+    --app-hover: rgb(255 255 255 / 0.04);
+    --app-nav: #0f172a;
+    --app-nav-border: rgb(255 255 255 / 0.08);
+    --app-input: rgb(255 255 255 / 0.05);
+}
+
+[data-theme="light"] {
+    --app-bg: #f8fafc;
+    --app-surface: #ffffff;
+    --app-surface-2: #f1f5f9;
+    --app-surface-dim: #f8fafc;
+    --app-border: #e2e8f0;
+    --app-border-subtle: #f1f5f9;
+    --app-text: #0f172a;
+    --app-text-2: #475569;
+    --app-text-3: #94a3b8;
+    --app-hover: #f1f5f9;
+    --app-nav: #ffffff;
+    --app-nav-border: #e2e8f0;
+    --app-input: #ffffff;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -127,4 +185,7 @@
   html {
     @apply font-sans;
     }
+  [data-theme="light"] .app-card {
+    box-shadow: 0 2px 8px rgb(0 0 0 / 0.06);
+  }
 }
