@@ -916,9 +916,10 @@ export const exercises = [
     "name": "Chin-Up",
     "category": "pull",
     "muscles": [
-      "forearms",
+      "back",
       "lats",
-      "biceps"
+      "biceps",
+      "forearms"
     ],
     "equipment": "bodyweight",
     "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/1326-T2mxWqc.gif",
@@ -942,9 +943,11 @@ export const exercises = [
     "name": "Pull-Up",
     "category": "pull",
     "muscles": [
-      "forearms",
+      "back",
       "lats",
-      "biceps"
+      "biceps",
+      "core",
+      "forearms"
     ],
     "equipment": "bodyweight",
     "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0652-lBDjFxJ.gif",
@@ -3105,9 +3108,8 @@ export const exercises = [
     "name": "Cable Lateral Raise",
     "category": "shoulders",
     "muscles": [
-      "triceps",
-      "delts",
-      "traps"
+      "shoulders",
+      "deltoids"
     ],
     "equipment": "cable",
     "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0178-goJ6ezq.gif",
@@ -4477,7 +4479,7 @@ export const exercises = [
   },
   {
     "id": "45-side-bend",
-    "name": "45\u00b0 Side Bend",
+    "name": "45° Side Bend",
     "category": "core",
     "muscles": [
       "obliques",
@@ -4581,9 +4583,14 @@ export const exercises = [
     "id": "barbell-bench-press",
     "name": "Barbell Bench Press",
     "category": "push",
-    "muscles": ["chest", "pectorals", "triceps", "deltoids"],
+    "muscles": [
+      "chest",
+      "pectorals",
+      "triceps",
+      "deltoids"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0025-EIeI8Vf.gif",
     "alternatives": [
       "dumbbell-bench-press",
       "incline-barbell-bench-press",
@@ -4596,9 +4603,14 @@ export const exercises = [
     "id": "dumbbell-bench-press",
     "name": "Dumbbell Bench Press",
     "category": "push",
-    "muscles": ["chest", "pectorals", "triceps", "deltoids"],
+    "muscles": [
+      "chest",
+      "pectorals",
+      "triceps",
+      "deltoids"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0289-SpYC0Kp.gif",
     "alternatives": [
       "barbell-bench-press",
       "incline-barbell-bench-press",
@@ -4611,9 +4623,14 @@ export const exercises = [
     "id": "incline-barbell-bench-press",
     "name": "Incline Barbell Bench Press",
     "category": "push",
-    "muscles": ["chest", "pectorals", "shoulders", "triceps"],
+    "muscles": [
+      "chest",
+      "pectorals",
+      "shoulders",
+      "triceps"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0047-3TZduzM.gif",
     "alternatives": [
       "barbell-bench-press",
       "dumbbell-bench-press",
@@ -4625,9 +4642,14 @@ export const exercises = [
     "id": "incline-dumbbell-bench-press",
     "name": "Incline Dumbbell Bench Press",
     "category": "push",
-    "muscles": ["chest", "pectorals", "shoulders", "triceps"],
+    "muscles": [
+      "chest",
+      "pectorals",
+      "shoulders",
+      "triceps"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0314-ns0SIbU.gif",
     "alternatives": [
       "barbell-bench-press",
       "dumbbell-bench-press",
@@ -4639,9 +4661,13 @@ export const exercises = [
     "id": "machine-chest-press",
     "name": "Machine Chest Press",
     "category": "push",
-    "muscles": ["chest", "pectorals", "triceps"],
+    "muscles": [
+      "chest",
+      "pectorals",
+      "triceps"
+    ],
     "equipment": "machine",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0577-T0yTjgW.gif",
     "alternatives": [
       "barbell-bench-press",
       "dumbbell-bench-press",
@@ -4653,9 +4679,13 @@ export const exercises = [
     "id": "barbell-overhead-press",
     "name": "Barbell Overhead Press",
     "category": "shoulders",
-    "muscles": ["shoulders", "deltoids", "triceps"],
+    "muscles": [
+      "shoulders",
+      "deltoids",
+      "triceps"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0091-kTbSH9h.gif",
     "alternatives": [
       "dumbbell-shoulder-press",
       "arnold-press",
@@ -4667,9 +4697,13 @@ export const exercises = [
     "id": "dumbbell-shoulder-press",
     "name": "Dumbbell Shoulder Press",
     "category": "shoulders",
-    "muscles": ["shoulders", "deltoids", "triceps"],
+    "muscles": [
+      "shoulders",
+      "deltoids",
+      "triceps"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0405-znQUdHY.gif",
     "alternatives": [
       "barbell-overhead-press",
       "arnold-press",
@@ -4681,9 +4715,13 @@ export const exercises = [
     "id": "arnold-press",
     "name": "Arnold Press",
     "category": "shoulders",
-    "muscles": ["shoulders", "deltoids", "triceps"],
+    "muscles": [
+      "shoulders",
+      "deltoids",
+      "triceps"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/2137-Xy4jlWA.gif",
     "alternatives": [
       "barbell-overhead-press",
       "dumbbell-shoulder-press",
@@ -4694,9 +4732,12 @@ export const exercises = [
     "id": "lateral-raise",
     "name": "Lateral Raise",
     "category": "shoulders",
-    "muscles": ["shoulders", "deltoids"],
+    "muscles": [
+      "shoulders",
+      "deltoids"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0334-DsgkuIt.gif",
     "alternatives": [
       "cable-lateral-raise",
       "dumbbell-shoulder-press",
@@ -4704,25 +4745,17 @@ export const exercises = [
     ]
   },
   {
-    "id": "cable-lateral-raise",
-    "name": "Cable Lateral Raise",
-    "category": "shoulders",
-    "muscles": ["shoulders", "deltoids"],
-    "equipment": "cable",
-    "gifUrl": null,
-    "alternatives": [
-      "lateral-raise",
-      "dumbbell-shoulder-press",
-      "cable-shoulder-press"
-    ]
-  },
-  {
     "id": "face-pull",
     "name": "Face Pull",
     "category": "shoulders",
-    "muscles": ["shoulders", "rear deltoids", "traps", "back"],
+    "muscles": [
+      "shoulders",
+      "rear deltoids",
+      "traps",
+      "back"
+    ],
     "equipment": "cable",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0203-wqNPGCg.gif",
     "alternatives": [
       "lateral-raise",
       "cable-lateral-raise",
@@ -4733,9 +4766,12 @@ export const exercises = [
     "id": "triceps-pushdown",
     "name": "Triceps Pushdown",
     "category": "push",
-    "muscles": ["triceps", "forearms"],
+    "muscles": [
+      "triceps",
+      "forearms"
+    ],
     "equipment": "cable",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0241-gAwDzB3.gif",
     "alternatives": [
       "dumbbell-kickback",
       "triceps-dip",
@@ -4746,9 +4782,15 @@ export const exercises = [
     "id": "barbell-deadlift",
     "name": "Barbell Deadlift",
     "category": "pull",
-    "muscles": ["back", "hamstrings", "glutes", "lower back", "core"],
+    "muscles": [
+      "back",
+      "hamstrings",
+      "glutes",
+      "lower back",
+      "core"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0032-ila4NZS.gif",
     "alternatives": [
       "romanian-deadlift",
       "barbell-row",
@@ -4759,9 +4801,13 @@ export const exercises = [
     "id": "romanian-deadlift",
     "name": "Romanian Deadlift",
     "category": "legs",
-    "muscles": ["hamstrings", "glutes", "lower back"],
+    "muscles": [
+      "hamstrings",
+      "glutes",
+      "lower back"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0085-wQ2c4XD.gif",
     "alternatives": [
       "barbell-deadlift",
       "leg-press",
@@ -4772,9 +4818,13 @@ export const exercises = [
     "id": "lat-pulldown",
     "name": "Lat Pulldown",
     "category": "pull",
-    "muscles": ["back", "lats", "biceps"],
+    "muscles": [
+      "back",
+      "lats",
+      "biceps"
+    ],
     "equipment": "machine",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/2330-LEprlgG.gif",
     "alternatives": [
       "pull-up",
       "chin-up",
@@ -4783,38 +4833,17 @@ export const exercises = [
     ]
   },
   {
-    "id": "pull-up",
-    "name": "Pull-Up",
-    "category": "pull",
-    "muscles": ["back", "lats", "biceps", "core"],
-    "equipment": "bodyweight",
-    "gifUrl": null,
-    "alternatives": [
-      "chin-up",
-      "lat-pulldown",
-      "barbell-row"
-    ]
-  },
-  {
-    "id": "chin-up",
-    "name": "Chin-Up",
-    "category": "pull",
-    "muscles": ["back", "biceps", "lats", "forearms"],
-    "equipment": "bodyweight",
-    "gifUrl": null,
-    "alternatives": [
-      "pull-up",
-      "lat-pulldown",
-      "barbell-row"
-    ]
-  },
-  {
     "id": "barbell-row",
     "name": "Barbell Row",
     "category": "pull",
-    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "muscles": [
+      "back",
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0027-eZyBC3j.gif",
     "alternatives": [
       "dumbbell-row",
       "seated-cable-row",
@@ -4825,9 +4854,14 @@ export const exercises = [
     "id": "dumbbell-row",
     "name": "Dumbbell Row",
     "category": "pull",
-    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "muscles": [
+      "back",
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0293-BJ0Hz5L.gif",
     "alternatives": [
       "barbell-row",
       "seated-cable-row",
@@ -4838,9 +4872,14 @@ export const exercises = [
     "id": "seated-cable-row",
     "name": "Seated Cable Row",
     "category": "pull",
-    "muscles": ["back", "lats", "biceps", "rhomboids"],
+    "muscles": [
+      "back",
+      "lats",
+      "biceps",
+      "rhomboids"
+    ],
     "equipment": "cable",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0861-fUBheHs.gif",
     "alternatives": [
       "barbell-row",
       "dumbbell-row",
@@ -4851,9 +4890,15 @@ export const exercises = [
     "id": "barbell-back-squat",
     "name": "Barbell Back Squat",
     "category": "legs",
-    "muscles": ["quads", "quadriceps", "glutes", "hamstrings", "calves"],
+    "muscles": [
+      "quads",
+      "quadriceps",
+      "glutes",
+      "hamstrings",
+      "calves"
+    ],
     "equipment": "barbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0043-qXTaZnJ.gif",
     "alternatives": [
       "goblet-squat",
       "leg-press",
@@ -4865,9 +4910,14 @@ export const exercises = [
     "id": "goblet-squat",
     "name": "Goblet Squat",
     "category": "legs",
-    "muscles": ["quads", "quadriceps", "glutes", "core"],
+    "muscles": [
+      "quads",
+      "quadriceps",
+      "glutes",
+      "core"
+    ],
     "equipment": "dumbbell",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/1760-yn8yg1r.gif",
     "alternatives": [
       "barbell-back-squat",
       "leg-press",
@@ -4878,9 +4928,14 @@ export const exercises = [
     "id": "leg-press",
     "name": "Leg Press",
     "category": "legs",
-    "muscles": ["quads", "quadriceps", "glutes", "hamstrings"],
+    "muscles": [
+      "quads",
+      "quadriceps",
+      "glutes",
+      "hamstrings"
+    ],
     "equipment": "machine",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/2287-V07qpXy.gif",
     "alternatives": [
       "barbell-back-squat",
       "goblet-squat",
@@ -4888,25 +4943,16 @@ export const exercises = [
     ]
   },
   {
-    "id": "dumbbell-lunge",
-    "name": "Dumbbell Lunge",
-    "category": "legs",
-    "muscles": ["quads", "quadriceps", "glutes", "hamstrings"],
-    "equipment": "dumbbell",
-    "gifUrl": null,
-    "alternatives": [
-      "barbell-back-squat",
-      "goblet-squat",
-      "leg-press"
-    ]
-  },
-  {
     "id": "plank",
     "name": "Plank",
     "category": "core",
-    "muscles": ["abs", "core", "lower back"],
+    "muscles": [
+      "abs",
+      "core",
+      "lower back"
+    ],
     "equipment": "bodyweight",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/3665-hCjGsRQ.gif",
     "alternatives": [
       "hanging-leg-raise",
       "russian-twist",
@@ -4917,9 +4963,13 @@ export const exercises = [
     "id": "hanging-leg-raise",
     "name": "Hanging Leg Raise",
     "category": "core",
-    "muscles": ["abs", "core", "hip flexors"],
+    "muscles": [
+      "abs",
+      "core",
+      "hip flexors"
+    ],
     "equipment": "bodyweight",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0472-I3tsCnC.gif",
     "alternatives": [
       "plank",
       "russian-twist",
@@ -4930,9 +4980,13 @@ export const exercises = [
     "id": "russian-twist",
     "name": "Russian Twist",
     "category": "core",
-    "muscles": ["obliques", "abs", "core"],
+    "muscles": [
+      "obliques",
+      "abs",
+      "core"
+    ],
     "equipment": "bodyweight",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0687-XVDdcoj.gif",
     "alternatives": [
       "plank",
       "hanging-leg-raise",
@@ -4943,13 +4997,261 @@ export const exercises = [
     "id": "cable-crunch",
     "name": "Cable Crunch",
     "category": "core",
-    "muscles": ["abs", "core"],
+    "muscles": [
+      "abs",
+      "core"
+    ],
     "equipment": "cable",
-    "gifUrl": null,
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0175-WW95auq.gif",
     "alternatives": [
       "plank",
       "hanging-leg-raise",
       "russian-twist"
+    ]
+  },
+  {
+    "id": "leg-extension",
+    "name": "Leg Extension",
+    "category": "legs",
+    "muscles": [
+      "quadriceps",
+      "quads"
+    ],
+    "equipment": "machine",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0585-my33uHU.gif",
+    "alternatives": [
+      "leg-press",
+      "barbell-back-squat",
+      "goblet-squat",
+      "step-up"
+    ]
+  },
+  {
+    "id": "leg-curl",
+    "name": "Leg Curl",
+    "category": "legs",
+    "muscles": [
+      "hamstrings",
+      "glutes"
+    ],
+    "equipment": "machine",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0586-17lJ1kr.gif",
+    "alternatives": [
+      "romanian-deadlift",
+      "leg-press",
+      "good-morning"
+    ]
+  },
+  {
+    "id": "standing-calf-raise",
+    "name": "Standing Calf Raise",
+    "category": "legs",
+    "muscles": [
+      "calves",
+      "soleus"
+    ],
+    "equipment": "dumbbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0417-dPmaUaU.gif",
+    "alternatives": [
+      "leg-press",
+      "barbell-back-squat",
+      "leg-extension"
+    ]
+  },
+  {
+    "id": "step-up",
+    "name": "Step-Up",
+    "category": "legs",
+    "muscles": [
+      "quads",
+      "quadriceps",
+      "glutes",
+      "hamstrings"
+    ],
+    "equipment": "dumbbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0431-aXtJhlg.gif",
+    "alternatives": [
+      "barbell-back-squat",
+      "goblet-squat",
+      "dumbbell-lunge",
+      "walking-lunge"
+    ]
+  },
+  {
+    "id": "good-morning",
+    "name": "Good Morning",
+    "category": "legs",
+    "muscles": [
+      "hamstrings",
+      "lower back",
+      "glutes"
+    ],
+    "equipment": "barbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0044-XlZ4lAC.gif",
+    "alternatives": [
+      "romanian-deadlift",
+      "barbell-deadlift",
+      "leg-curl"
+    ]
+  },
+  {
+    "id": "glute-bridge",
+    "name": "Glute Bridge",
+    "category": "legs",
+    "muscles": [
+      "glutes",
+      "hamstrings",
+      "core"
+    ],
+    "equipment": "bodyweight",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/3523-aWedzZX.gif",
+    "alternatives": [
+      "romanian-deadlift",
+      "good-morning",
+      "leg-curl",
+      "step-up"
+    ]
+  },
+  {
+    "id": "mountain-climber",
+    "name": "Mountain Climber",
+    "category": "core",
+    "muscles": [
+      "core",
+      "abs",
+      "hip flexors",
+      "shoulders"
+    ],
+    "equipment": "bodyweight",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0630-RJgzwny.gif",
+    "alternatives": [
+      "plank",
+      "hanging-leg-raise",
+      "russian-twist",
+      "cable-crunch"
+    ]
+  },
+  {
+    "id": "ab-wheel",
+    "name": "Ab Wheel Rollout",
+    "category": "core",
+    "muscles": [
+      "abs",
+      "core",
+      "lower back",
+      "shoulders"
+    ],
+    "equipment": "bodyweight",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0857-NAgVB3t.gif",
+    "alternatives": [
+      "plank",
+      "hanging-leg-raise",
+      "cable-crunch"
+    ]
+  },
+  {
+    "id": "rear-delt-fly",
+    "name": "Rear Delt Fly",
+    "category": "shoulders",
+    "muscles": [
+      "rear deltoids",
+      "shoulders",
+      "rhomboids"
+    ],
+    "equipment": "dumbbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/2470-Ion0XWz.gif",
+    "alternatives": [
+      "face-pull",
+      "lateral-raise",
+      "cable-lateral-raise",
+      "dumbbell-front-raise"
+    ]
+  },
+  {
+    "id": "upright-row",
+    "name": "Upright Row",
+    "category": "shoulders",
+    "muscles": [
+      "shoulders",
+      "deltoids",
+      "traps",
+      "biceps"
+    ],
+    "equipment": "barbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0120-UDlhcO8.gif",
+    "alternatives": [
+      "lateral-raise",
+      "barbell-overhead-press",
+      "dumbbell-front-raise",
+      "face-pull"
+    ]
+  },
+  {
+    "id": "skull-crusher",
+    "name": "Skull Crusher",
+    "category": "push",
+    "muscles": [
+      "triceps"
+    ],
+    "equipment": "barbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0060-h8LFzo9.gif",
+    "alternatives": [
+      "triceps-pushdown",
+      "overhead-tricep-extension",
+      "triceps-dip",
+      "cable-kickback"
+    ]
+  },
+  {
+    "id": "overhead-tricep-extension",
+    "name": "Overhead Tricep Extension",
+    "category": "push",
+    "muscles": [
+      "triceps"
+    ],
+    "equipment": "cable",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0194-2IxROQ1.gif",
+    "alternatives": [
+      "skull-crusher",
+      "triceps-pushdown",
+      "cable-kickback",
+      "triceps-dip"
+    ]
+  },
+  {
+    "id": "cable-standing-fly",
+    "name": "Cable Standing Fly",
+    "category": "push",
+    "muscles": [
+      "pectorals",
+      "chest",
+      "deltoids"
+    ],
+    "equipment": "cable",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0227-Pr9Rhf4.gif",
+    "alternatives": [
+      "dumbbell-fly",
+      "barbell-bench-press",
+      "dumbbell-bench-press",
+      "machine-chest-press"
+    ]
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Hammer Curl",
+    "category": "pull",
+    "muscles": [
+      "biceps",
+      "brachialis",
+      "forearms"
+    ],
+    "equipment": "dumbbell",
+    "gifUrl": "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/videos/0313-slDvUAU.gif",
+    "alternatives": [
+      "barbell-curl",
+      "cable-curl",
+      "ez-barbell-curl",
+      "chin-up"
     ]
   }
 ];
